@@ -160,8 +160,8 @@ static JavaCPP_noinline jthrowable JavaCPP_handleException(JNIEnv* env, int i) {
 
 
 
-static void JavaCPP_se_lublin_humla_audio_javacpp_Speex_00024SpeexBits_deallocate(::SpeexBits* p) { delete p; }
-static void JavaCPP_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_deallocate(::_JitterBufferPacket* p) { delete p; }
+static void JavaCPP_bo_htakey_rimic_audio_javacpp_Speex_00024SpeexBits_deallocate(::SpeexBits* p) { delete p; }
+static void JavaCPP_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_deallocate(::_JitterBufferPacket* p) { delete p; }
 static void JavaCPP_com_googlecode_javacpp_BytePointer_deallocateArray(signed char* p) { delete[] p; }
 static void JavaCPP_com_googlecode_javacpp_ShortPointer_deallocateArray(short* p) { delete[] p; }
 static void JavaCPP_com_googlecode_javacpp_IntPointer_deallocateArray(int* p) { delete[] p; }
@@ -1024,7 +1024,7 @@ JNIEXPORT void JNICALL Java_com_googlecode_javacpp_SizeTPointer_allocateArray(JN
     env->CallNonvirtualVoidMethodA(obj, JavaCPP_getClass(env, 1), JavaCPP_initMID, args);
 }
 
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024SpeexBits_allocate(JNIEnv* env, jobject obj) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024SpeexBits_allocate(JNIEnv* env, jobject obj) {
     if (!env->IsSameObject(env->GetObjectClass(obj), JavaCPP_getClass(env, 14))) {
         return;
     }
@@ -1035,7 +1035,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024SpeexBits_a
         jvalue args[3];
         args[0].j = ptr_to_jlong(rptr);
         args[1].i = rcapacity;
-        args[2].j = ptr_to_jlong(&JavaCPP_se_lublin_humla_audio_javacpp_Speex_00024SpeexBits_deallocate);
+        args[2].j = ptr_to_jlong(&JavaCPP_bo_htakey_rimic_audio_javacpp_Speex_00024SpeexBits_deallocate);
         env->CallNonvirtualVoidMethodA(obj, JavaCPP_getClass(env, 1), JavaCPP_initMID, args);
     } catch (...) {
         exc = JavaCPP_handleException(env, 15);
@@ -1046,7 +1046,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024SpeexBits_a
     }
 }
 
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_getTimestamp(JNIEnv* env, jobject obj) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_getTimestamp(JNIEnv* env, jobject obj) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1059,7 +1059,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     rarg = (jint)rvalue;
     return rarg;
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_getData(JNIEnv* env, jobject obj) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_getData(JNIEnv* env, jobject obj) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1076,7 +1076,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBu
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_sequence(JNIEnv* env, jobject obj) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_sequence(JNIEnv* env, jobject obj) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1089,7 +1089,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     rarg = (jint)rvalue;
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_getLength(JNIEnv* env, jobject obj) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_getLength(JNIEnv* env, jobject obj) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1102,7 +1102,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     rarg = (jint)rvalue;
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_setLength(JNIEnv* env, jobject obj, jint arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_setLength(JNIEnv* env, jobject obj, jint arg0) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1112,7 +1112,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     ptr += position;
     ptr->len = arg0;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_allocate(JNIEnv* env, jobject obj) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_allocate(JNIEnv* env, jobject obj) {
     if (!env->IsSameObject(env->GetObjectClass(obj), JavaCPP_getClass(env, 16))) {
         return;
     }
@@ -1123,7 +1123,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
         jvalue args[3];
         args[0].j = ptr_to_jlong(rptr);
         args[1].i = rcapacity;
-        args[2].j = ptr_to_jlong(&JavaCPP_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_deallocate);
+        args[2].j = ptr_to_jlong(&JavaCPP_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_deallocate);
         env->CallNonvirtualVoidMethodA(obj, JavaCPP_getClass(env, 1), JavaCPP_initMID, args);
     } catch (...) {
         exc = JavaCPP_handleException(env, 15);
@@ -1133,7 +1133,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
         env->Throw(exc);
     }
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_setTimestamp(JNIEnv* env, jobject obj, jint arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_setTimestamp(JNIEnv* env, jobject obj, jint arg0) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1143,7 +1143,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     ptr += position;
     ptr->timestamp = arg0;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_setData__Ljava_nio_ByteBuffer_2(JNIEnv* env, jobject obj, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_setData__Ljava_nio_ByteBuffer_2(JNIEnv* env, jobject obj, jobject arg0) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1154,7 +1154,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     signed char* ptr0 = arg0 == NULL ? NULL : (signed char*)env->GetDirectBufferAddress(arg0);
     ptr->data = (char *)ptr0;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_setData___3B(JNIEnv* env, jobject obj, jbyteArray arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_setData___3B(JNIEnv* env, jobject obj, jbyteArray arg0) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1166,7 +1166,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     ptr->data = (char *)ptr0;
     if (arg0 != NULL) env->ReleasePrimitiveArrayCritical(arg0, ptr0, 0);
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_getSpan(JNIEnv* env, jobject obj) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_getSpan(JNIEnv* env, jobject obj) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1179,7 +1179,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     rarg = (jint)rvalue;
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_setSpan(JNIEnv* env, jobject obj, jint arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_setSpan(JNIEnv* env, jobject obj, jint arg0) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1189,7 +1189,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     ptr += position;
     ptr->span = arg0;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_setSequence(JNIEnv* env, jobject obj, jint arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_setSequence(JNIEnv* env, jobject obj, jint arg0) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1199,7 +1199,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     ptr += position;
     ptr->sequence = arg0;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_getUserData(JNIEnv* env, jobject obj) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_getUserData(JNIEnv* env, jobject obj) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1212,7 +1212,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     rarg = (jint)rvalue;
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBufferPacket_setUserData(JNIEnv* env, jobject obj, jint arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_00024JitterBufferPacket_setUserData(JNIEnv* env, jobject obj, jint arg0) {
     ::_JitterBufferPacket* ptr = (::_JitterBufferPacket*)jlong_to_ptr(env->GetLongField(obj, JavaCPP_addressFID));
     if (ptr == NULL) {
         env->ThrowNew(JavaCPP_getClass(env, 2), "This pointer address is NULL.");
@@ -1223,7 +1223,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_00024JitterBuffe
     ptr->user_data = arg0;
 }
 
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1decode(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jfloatArray arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1decode(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jfloatArray arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1246,7 +1246,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1decode(JN
     }
     return rarg;
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1lib_1get_1mode(JNIEnv* env, jclass cls, jint arg0) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1lib_1get_1mode(JNIEnv* env, jclass cls, jint arg0) {
     jobject rarg = NULL;
     const void* rptr;
     jthrowable exc = NULL;
@@ -1265,7 +1265,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1lib_1g
     }
     return rarg;
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1decoder_1init(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1decoder_1init(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1289,7 +1289,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1decode
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1decoder_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1decoder_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1307,7 +1307,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1decoder_1
         env->Throw(exc);
     }
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1decoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1decoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1322,7 +1322,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1decoder_1
         env->Throw(exc);
     }
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1resampler_1init(JNIEnv* env, jclass cls, jint arg0, jint arg1, jint arg2, jint arg3, jobject arg4) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1resampler_1init(JNIEnv* env, jclass cls, jint arg0, jint arg1, jint arg2, jint arg3, jobject arg4) {
     int* ptr4 = arg4 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg4, JavaCPP_addressFID));
     jint position4 = arg4 == NULL ? 0 : env->GetIntField(arg4, JavaCPP_positionFID);
     ptr4 += position4;
@@ -1344,7 +1344,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1resamp
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1resampler_1process_1int(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jshortArray arg2, jintArray arg3, jshortArray arg4, jintArray arg5) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1resampler_1process_1int(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jshortArray arg2, jintArray arg3, jshortArray arg4, jintArray arg5) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1370,7 +1370,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1resampler
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1resampler_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1resampler_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1385,7 +1385,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1resampler
         env->Throw(exc);
     }
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1init(JNIEnv* env, jclass cls, jint arg0) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1init(JNIEnv* env, jclass cls, jint arg0) {
     jobject rarg = NULL;
     void* rptr;
     jthrowable exc = NULL;
@@ -1404,7 +1404,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffe
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1reset(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1reset(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1419,7 +1419,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1
         env->Throw(exc);
     }
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1434,7 +1434,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1
         env->Throw(exc);
     }
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1put(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1put(JNIEnv* env, jclass cls, jobject arg0, jobject arg1) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1452,7 +1452,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1
         env->Throw(exc);
     }
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1get(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jobject arg3) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1get(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jobject arg3) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1476,7 +1476,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1get_1pointer_1timestamp(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1get_1pointer_1timestamp(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1494,7 +1494,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1tick(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1tick(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1509,7 +1509,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1
         env->Throw(exc);
     }
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1530,7 +1530,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1update_1delay(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jobject arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_jitter_1buffer_1update_1delay(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jobject arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1554,7 +1554,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_jitter_1buffer_1
     }
     return rarg;
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preprocess_1state_1init(JNIEnv* env, jclass cls, jint arg0, jint arg1) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1preprocess_1state_1init(JNIEnv* env, jclass cls, jint arg0, jint arg1) {
     jobject rarg = NULL;
     void* rptr;
     jthrowable exc = NULL;
@@ -1573,7 +1573,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1prepro
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preprocess_1state_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1preprocess_1state_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1588,7 +1588,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preproces
         env->Throw(exc);
     }
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preprocess_1run(JNIEnv* env, jclass cls, jobject arg0, jshortArray arg1) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1preprocess_1run(JNIEnv* env, jclass cls, jobject arg0, jshortArray arg1) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1608,7 +1608,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preproces
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preprocess(JNIEnv* env, jclass cls, jobject arg0, jshortArray arg1, jintArray arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1preprocess(JNIEnv* env, jclass cls, jobject arg0, jshortArray arg1, jintArray arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1630,7 +1630,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preproces
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preprocess_1estimate_1update(JNIEnv* env, jclass cls, jobject arg0, jshortArray arg1) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1preprocess_1estimate_1update(JNIEnv* env, jclass cls, jobject arg0, jshortArray arg1) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1647,7 +1647,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preproces
         env->Throw(exc);
     }
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preprocess_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1preprocess_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1668,7 +1668,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1preproces
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1bits_1init(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1bits_1init(JNIEnv* env, jclass cls, jobject arg0) {
     ::SpeexBits* ptr0 = arg0 == NULL ? NULL : (::SpeexBits*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1683,7 +1683,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1bits_1ini
         env->Throw(exc);
     }
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1bits_1read_1from(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1bits_1read_1from(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2) {
     ::SpeexBits* ptr0 = arg0 == NULL ? NULL : (::SpeexBits*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1699,7 +1699,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1bits_1rea
         env->Throw(exc);
     }
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1bits_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1bits_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     ::SpeexBits* ptr0 = arg0 == NULL ? NULL : (::SpeexBits*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1714,7 +1714,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1bits_1des
         env->Throw(exc);
     }
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1encoder_1init(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1encoder_1init(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1738,7 +1738,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1encode
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1encoder_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1encoder_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1756,7 +1756,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1encoder_1
         env->Throw(exc);
     }
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_Speex_speex_1encoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1encoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
