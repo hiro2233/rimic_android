@@ -1012,7 +1012,7 @@ JNIEXPORT void JNICALL Java_com_googlecode_javacpp_SizeTPointer_allocateArray(JN
     env->CallNonvirtualVoidMethodA(obj, JavaCPP_getClass(env, 1), JavaCPP_initMID, args);
 }
 
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decode(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jshortArray arg3, jint arg4) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1decode(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jshortArray arg3, jint arg4) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1033,7 +1033,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decode(JN
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1decoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1048,7 +1048,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decoder_1
         env->Throw(exc);
     }
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decoder_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1decoder_1ctl(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1069,7 +1069,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decoder_1
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1mode_1info(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1mode_1info(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1090,7 +1090,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1mode_1inf
     }
     return rarg;
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1mode_1create(JNIEnv* env, jclass cls, jint arg0, jint arg1, jobject arg2) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1mode_1create(JNIEnv* env, jclass cls, jint arg0, jint arg1, jobject arg2) {
     int* ptr2 = arg2 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
     jint position2 = arg2 == NULL ? 0 : env->GetIntField(arg2, JavaCPP_positionFID);
     ptr2 += position2;
@@ -1112,7 +1112,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1mode_1
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1mode_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1mode_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1127,7 +1127,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1mode_1des
         env->Throw(exc);
     }
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encoder_1create(JNIEnv* env, jclass cls, jint arg0, jint arg1, jobject arg2) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1encoder_1create(JNIEnv* env, jclass cls, jint arg0, jint arg1, jobject arg2) {
     int* ptr2 = arg2 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
     jint position2 = arg2 == NULL ? 0 : env->GetIntField(arg2, JavaCPP_positionFID);
     ptr2 += position2;
@@ -1149,7 +1149,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encode
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encoder_1ctl__Lcom_googlecode_javacpp_Pointer_2II(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jint arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1encoder_1ctl__Lcom_googlecode_javacpp_Pointer_2II(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jint arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1167,7 +1167,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encoder_1
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encoder_1ctl__Lcom_googlecode_javacpp_Pointer_2ILcom_googlecode_javacpp_Pointer_2(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1encoder_1ctl__Lcom_googlecode_javacpp_Pointer_2ILcom_googlecode_javacpp_Pointer_2(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1188,7 +1188,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encoder_1
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encode(JNIEnv* env, jclass cls, jobject arg0, jshortArray arg1, jint arg2, jbyteArray arg3, jint arg4) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1encode(JNIEnv* env, jclass cls, jobject arg0, jshortArray arg1, jint arg2, jbyteArray arg3, jint arg4) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1210,7 +1210,7 @@ JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encode(JN
     }
     return rarg;
 }
-JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
+JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1encoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
@@ -1225,7 +1225,7 @@ JNIEXPORT void JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1encoder_1
         env->Throw(exc);
     }
 }
-JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decoder_1create(JNIEnv* env, jclass cls, jint arg0, jint arg1, jobject arg2) {
+JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1decoder_1create(JNIEnv* env, jclass cls, jint arg0, jint arg1, jobject arg2) {
     int* ptr2 = arg2 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
     jint position2 = arg2 == NULL ? 0 : env->GetIntField(arg2, JavaCPP_positionFID);
     ptr2 += position2;
@@ -1247,7 +1247,7 @@ JNIEXPORT jobject JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decode
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_se_lublin_humla_audio_javacpp_CELT11_celt_1decode_1float(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jfloatArray arg3, jint arg4) {
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT11_celt_1decode_1float(JNIEnv* env, jclass cls, jobject arg0, jobject arg1, jint arg2, jfloatArray arg3, jint arg4) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
     ptr0 += position0;
