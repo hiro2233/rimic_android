@@ -84,9 +84,9 @@ static const char* JavaCPP_classNames[17] = {
         "com/googlecode/javacpp/BoolPointer",
         "com/googlecode/javacpp/CLongPointer",
         "com/googlecode/javacpp/SizeTPointer",
-        "se/lublin/humla/audio/javacpp/Speex$SpeexBits",
+        "bo/htakey/rimic/audio/javacpp/Speex$SpeexBits",
         "java/lang/RuntimeException",
-        "se/lublin/humla/audio/javacpp/Speex$JitterBufferPacket" };
+        "bo/htakey/rimic/audio/javacpp/Speex$JitterBufferPacket" };
 static jclass JavaCPP_classes[17] = { NULL };
 static jmethodID JavaCPP_initMID = NULL;
 static jfieldID JavaCPP_addressFID = NULL;
