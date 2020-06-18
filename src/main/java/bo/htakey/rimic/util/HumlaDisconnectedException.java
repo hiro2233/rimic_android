@@ -6,12 +6,12 @@ package bo.htakey.rimic.util;
  */
 
 @SuppressWarnings("serial")
-public class HumlaDisconnectedException extends RuntimeException {
-    public HumlaDisconnectedException() {
+public class RimicDisconnectedException extends RuntimeException {
+    public RimicDisconnectedException() {
         super("Caller attempted to use the protocol while disconnected.");
     }
 
-    public HumlaDisconnectedException(String reason) {
+    public RimicDisconnectedException(String reason) {
         super(reason);
     }
 }

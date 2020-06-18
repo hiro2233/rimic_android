@@ -18,7 +18,7 @@
 package bo.htakey.rimic.exception;
 
 /**
- * Called when Humla has not yet received the ServerSync message from the server.
+ * Called when Rimic has not yet received the ServerSync message from the server.
  * Created by andrew on 24/10/15.
  */
 @SuppressWarnings("serial")

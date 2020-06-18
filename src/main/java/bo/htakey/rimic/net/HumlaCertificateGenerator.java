@@ -42,8 +42,8 @@ import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
 
-public class HumlaCertificateGenerator {
-    private static final String ISSUER = "CN=Humla Client";
+public class RimicCertificateGenerator {
+    private static final String ISSUER = "CN=Rimic Client";
     private static final Integer YEARS_VALID = 20;
 
     public static X509Certificate generateCertificate(OutputStream output) throws NoSuchAlgorithmException, OperatorCreationException, CertificateException, KeyStoreException, NoSuchProviderException, IOException {
@@ -73,7 +73,7 @@ public class HumlaCertificateGenerator {
 
         KeyStore keyStore = KeyStore.getInstance("PKCS12", provider);
         keyStore.load(null, null);
-        keyStore.setKeyEntry("Humla Key", keyPair.getPrivate(), null, new X509Certificate[] { certificate });
+        keyStore.setKeyEntry("Rimic Key", keyPair.getPrivate(), null, new X509Certificate[] { certificate });
 
         keyStore.store(output, "".toCharArray());
 

@@ -43,11 +43,11 @@ import javax.net.ssl.X509TrustManager;
 
 import bo.htakey.rimic.Constants;
 
-public class HumlaSSLSocketFactory {
+public class RimicSSLSocketFactory {
     private SSLContext mContext;
-    private HumlaTrustManagerWrapper mTrustWrapper;
+    private RimicTrustManagerWrapper mTrustWrapper;
 
-    public HumlaSSLSocketFactory(KeyStore keystore, String keystorePassword, String trustStorePath, String trustStorePassword, String trustStoreFormat) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException, NoSuchProviderException, IOException, CertificateException {
+    public RimicSSLSocketFactory(KeyStore keystore, String keystorePassword, String trustStorePath, String trustStorePassword, String trustStoreFormat) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException, NoSuchProviderException, IOException, CertificateException {
         mContext = SSLContext.getInstance("TLS");
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
@@ -60,10 +60,10 @@ public class HumlaSSLSocketFactory {
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(trustStore);
-            mTrustWrapper = new HumlaTrustManagerWrapper((X509TrustManager) tmf.getTrustManagers()[0]);
+            mTrustWrapper = new RimicTrustManagerWrapper((X509TrustManager) tmf.getTrustManagers()[0]);
             Log.i(Constants.TAG, "Using custom trust store " + trustStorePath + " with system trust store");
         } else {
-            mTrustWrapper = new HumlaTrustManagerWrapper(null);
+            mTrustWrapper = new RimicTrustManagerWrapper(null);
             Log.i(Constants.TAG, "Using system trust store");
         }
 
@@ -96,13 +96,13 @@ public class HumlaSSLSocketFactory {
      * Wraps around a custom trust manager and stores the certificate chains that did not validate.
      * We can then send the chain to the user for manual validation.
      */
-    private static class HumlaTrustManagerWrapper implements X509TrustManager {
+    private static class RimicTrustManagerWrapper implements X509TrustManager {
 
         private X509TrustManager mDefaultTrustManager;
         private X509TrustManager mTrustManager;
         private X509Certificate[] mServerChain;
 
-        public HumlaTrustManagerWrapper(X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyStoreException {
+        public RimicTrustManagerWrapper(X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyStoreException {
             TrustManagerFactory dmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             dmf.init((KeyStore) null);
             mDefaultTrustManager = (X509TrustManager) dmf.getTrustManagers()[0];

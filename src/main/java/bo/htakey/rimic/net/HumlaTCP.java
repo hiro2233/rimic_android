@@ -35,14 +35,14 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocket;
 
 import bo.htakey.rimic.Constants;
-import bo.htakey.rimic.util.HumlaException;
+import bo.htakey.rimic.util.RimicException;
 
 /**
  * Class to maintain and interface with the TCP connection to a Mumble server.
  * Parses Mumble protobuf packets according to the Mumble protocol specification.
  */
-public class HumlaTCP extends HumlaNetworkThread {
-    private final HumlaSSLSocketFactory mSocketFactory;
+public class RimicTCP extends RimicNetworkThread {
+    private final RimicSSLSocketFactory mSocketFactory;
     private String mHost;
     private int mPort;
     private boolean mUseTor;
@@ -53,7 +53,7 @@ public class HumlaTCP extends HumlaNetworkThread {
     private boolean mConnected;
     private TCPConnectionListener mListener;
 
-    public HumlaTCP(HumlaSSLSocketFactory socketFactory) {
+    public RimicTCP(RimicSSLSocketFactory socketFactory) {
         mSocketFactory = socketFactory;
     }
 
@@ -76,10 +76,10 @@ public class HumlaTCP extends HumlaNetworkThread {
     public void run() {
         mRunning = true;
         try {
-            Log.i(Constants.TAG, "HumlaTCP: Connecting");
+            Log.i(Constants.TAG, "RimicTCP: Connecting");
 
             if(mUseTor)
-                mTCPSocket = mSocketFactory.createTorSocket(mHost, mPort, HumlaConnection.TOR_HOST, HumlaConnection.TOR_PORT);
+                mTCPSocket = mSocketFactory.createTorSocket(mHost, mPort, RimicConnection.TOR_HOST, RimicConnection.TOR_PORT);
             else
                 mTCPSocket = mSocketFactory.createSocket(mHost, mPort);
 
@@ -91,12 +91,12 @@ public class HumlaTCP extends HumlaNetworkThread {
             mTCPSocket.setKeepAlive(true);
             mTCPSocket.startHandshake();
 
-            Log.v(Constants.TAG, "HumlaTCP: Started handshake");
+            Log.v(Constants.TAG, "RimicTCP: Started handshake");
 
             mDataInput = new DataInputStream(mTCPSocket.getInputStream());
             mDataOutput = new DataOutputStream(mTCPSocket.getOutputStream());
 
-            Log.v(Constants.TAG, "HumlaTCP: Now listening");
+            Log.v(Constants.TAG, "RimicTCP: Now listening");
             mConnected = true;
 
             if(mListener != null) {
@@ -114,7 +114,7 @@ public class HumlaTCP extends HumlaNetworkThread {
                 final byte[] data = new byte[messageLength];
                 mDataInput.readFully(data);
 
-                final HumlaTCPMessageType tcpMessageType = HumlaTCPMessageType.values()[messageType];
+                final RimicTCPMessageType tcpMessageType = RimicTCPMessageType.values()[messageType];
                 if (mListener != null) {
                     executeOnMainThread(new Runnable() {
                         @Override
@@ -167,11 +167,11 @@ public class HumlaTCP extends HumlaNetworkThread {
      * @param message The message to send.
      * @param messageType The type of the message to send.
      */
-    public void sendMessage(final Message message, final HumlaTCPMessageType messageType) {
+    public void sendMessage(final Message message, final RimicTCPMessageType messageType) {
         executeOnSendThread(new Runnable() {
             @Override
             public void run() {
-                if (!HumlaConnection.UNLOGGED_MESSAGES.contains(messageType))
+                if (!RimicConnection.UNLOGGED_MESSAGES.contains(messageType))
                     Log.v(Constants.TAG, "OUT: " + messageType);
                 try {
                     mDataOutput.writeShort(messageType.ordinal());
@@ -190,11 +190,11 @@ public class HumlaTCP extends HumlaNetworkThread {
      * @param length The length of the byte array.
      * @param messageType The type of the message to send.
      */
-    public void sendMessage(final byte[] message, final int length, final HumlaTCPMessageType messageType) {
+    public void sendMessage(final byte[] message, final int length, final RimicTCPMessageType messageType) {
         executeOnSendThread(new Runnable() {
             @Override
             public void run() {
-                if (!HumlaConnection.UNLOGGED_MESSAGES.contains(messageType))
+                if (!RimicConnection.UNLOGGED_MESSAGES.contains(messageType))
                     Log.v(Constants.TAG, "OUT: " + messageType);
                 try {
                     mDataOutput.writeShort(messageType.ordinal());
@@ -243,8 +243,8 @@ public class HumlaTCP extends HumlaNetworkThread {
     private void error(String desc, Exception e) {
         if (!mRunning)
             return; // Don't handle errors post-disconnection.
-        final HumlaException ce = new HumlaException(desc, e,
-                HumlaException.HumlaDisconnectReason.CONNECTION_ERROR);
+        final RimicException ce = new RimicException(desc, e,
+                RimicException.RimicDisconnectReason.CONNECTION_ERROR);
         if(mListener != null)
             executeOnMainThread(new Runnable() {
                 @Override
@@ -257,8 +257,8 @@ public class HumlaTCP extends HumlaNetworkThread {
     public interface TCPConnectionListener {
         public void onTCPConnectionEstablished();
         public void onTLSHandshakeFailed(X509Certificate[] chain);
-        public void onTCPConnectionFailed(HumlaException e);
+        public void onTCPConnectionFailed(RimicException e);
         public void onTCPConnectionDisconnect();
-        public void onTCPMessageReceived(HumlaTCPMessageType type, int length, byte[] data);
+        public void onTCPMessageReceived(RimicTCPMessageType type, int length, byte[] data);
     }
 }

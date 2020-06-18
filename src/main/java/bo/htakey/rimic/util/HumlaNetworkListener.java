@@ -17,15 +17,15 @@
 
 package bo.htakey.rimic.util;
 
-import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.protobuf.Mumble;
-import bo.htakey.rimic.protocol.HumlaTCPMessageListener;
-import bo.htakey.rimic.protocol.HumlaUDPMessageListener;
+import bo.htakey.rimic.protocol.RimicTCPMessageListener;
+import bo.htakey.rimic.protocol.RimicUDPMessageListener;
 
 /**
  * Created by andrew on 23/04/14.
  */
-public class HumlaNetworkListener implements HumlaTCPMessageListener, HumlaUDPMessageListener {
+public class RimicNetworkListener implements RimicTCPMessageListener, RimicUDPMessageListener {
     @Override
     public void messageAuthenticate(Mumble.Authenticate msg) {
 
@@ -167,7 +167,7 @@ public class HumlaNetworkListener implements HumlaTCPMessageListener, HumlaUDPMe
     }
 
     @Override
-    public void messageVoiceData(byte[] data, HumlaUDPMessageType messageType) {
+    public void messageVoiceData(byte[] data, RimicUDPMessageType messageType) {
 
     }
 }

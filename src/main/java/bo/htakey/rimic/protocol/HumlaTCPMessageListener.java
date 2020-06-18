@@ -19,7 +19,7 @@ package bo.htakey.rimic.protocol;
 
 import bo.htakey.rimic.protobuf.Mumble;
 
-public interface HumlaTCPMessageListener {
+public interface RimicTCPMessageListener {
     public void messageAuthenticate(Mumble.Authenticate msg);
     public void messageBanList(Mumble.BanList msg);
     public void messageReject(Mumble.Reject msg);
@@ -53,7 +53,7 @@ public interface HumlaTCPMessageListener {
      * Designed to be subclassed at any level of the library, the default implementations do nothing.
      * Created by andrew on 24/06/13.
      */
-    public static class Stub implements HumlaTCPMessageListener {
+    public static class Stub implements RimicTCPMessageListener {
 
         public void messageAuthenticate(Mumble.Authenticate msg) {}
         public void messageBanList(Mumble.BanList msg) {}

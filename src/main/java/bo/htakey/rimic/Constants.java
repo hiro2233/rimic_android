@@ -33,5 +33,5 @@ public class Constants {
     public static final String PROTOCOL_STRING = PROTOCOL_MAJOR+ "." +PROTOCOL_MINOR+"."+PROTOCOL_PATCH;
     public static final int DEFAULT_PORT = 64738;
 
-    public static final String TAG = "Humla";
+    public static final String TAG = "Rimic";
 }

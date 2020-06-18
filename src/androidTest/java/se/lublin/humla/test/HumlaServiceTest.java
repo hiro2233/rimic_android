@@ -21,33 +21,33 @@ import android.content.Intent;
 import android.os.RemoteException;
 import android.test.ServiceTestCase;
 
-import bo.htakey.rimic.HumlaService;
-import bo.htakey.rimic.IHumlaService;
+import bo.htakey.rimic.RimicService;
+import bo.htakey.rimic.IRimicService;
 import bo.htakey.rimic.model.Server;
 
 /**
- * Tests to ensure the integrity of {@link HumlaService}'s state.
+ * Tests to ensure the integrity of {@link RimicService}'s state.
  * Created by andrew on 02/02/15.
  */
-public class HumlaServiceTest extends ServiceTestCase<HumlaService> {
+public class RimicServiceTest extends ServiceTestCase<RimicService> {
     private static final Server DUMMY_SERVER = new Server(-1, "dummy","example.com", 64738,
             "dummy_user", "dummy_pass");
 
-    public HumlaServiceTest() {
-        super(HumlaService.class);
+    public RimicServiceTest() {
+        super(RimicService.class);
     }
 
     /**
-     * Tests the state of a HumlaService prior to connection.
+     * Tests the state of a RimicService prior to connection.
      */
     public void testPreconnection() throws RemoteException {
-        Intent intent = new Intent(getContext(), HumlaService.class);
-        intent.putExtra(HumlaService.EXTRAS_SERVER, DUMMY_SERVER);
+        Intent intent = new Intent(getContext(), RimicService.class);
+        intent.putExtra(RimicService.EXTRAS_SERVER, DUMMY_SERVER);
         startService(intent);
-        IHumlaService service = getService();
+        IRimicService service = getService();
         assertFalse(service.isReconnecting());
         assertNull(service.getConnectionError());
-        assertEquals(HumlaService.ConnectionState.DISCONNECTED, service.getConnectionState());
+        assertEquals(RimicService.ConnectionState.DISCONNECTED, service.getConnectionState());
         assertEquals(DUMMY_SERVER, service.getTargetServer());
     }
 

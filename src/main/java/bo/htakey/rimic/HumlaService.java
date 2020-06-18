@@ -57,20 +57,20 @@ import bo.htakey.rimic.model.TalkState;
 import bo.htakey.rimic.model.User;
 import bo.htakey.rimic.model.WhisperTarget;
 import bo.htakey.rimic.model.WhisperTargetList;
-import bo.htakey.rimic.net.HumlaConnection;
-import bo.htakey.rimic.net.HumlaTCPMessageType;
-import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.RimicConnection;
+import bo.htakey.rimic.net.RimicTCPMessageType;
+import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.protobuf.Mumble;
 import bo.htakey.rimic.protocol.AudioHandler;
 import bo.htakey.rimic.protocol.ModelHandler;
-import bo.htakey.rimic.util.HumlaCallbacks;
-import bo.htakey.rimic.util.HumlaDisconnectedException;
-import bo.htakey.rimic.util.HumlaException;
-import bo.htakey.rimic.util.HumlaLogger;
-import bo.htakey.rimic.util.IHumlaObserver;
+import bo.htakey.rimic.util.RimicCallbacks;
+import bo.htakey.rimic.util.RimicDisconnectedException;
+import bo.htakey.rimic.util.RimicException;
+import bo.htakey.rimic.util.RimicLogger;
+import bo.htakey.rimic.util.IRimicObserver;
 import bo.htakey.rimic.util.VoiceTargetMode;
 
-public class HumlaService extends Service implements IHumlaService, IHumlaSession, HumlaConnection.HumlaConnectionListener, HumlaLogger, BluetoothScoReceiver.Listener {
+public class RimicService extends Service implements IRimicService, IRimicSession, RimicConnection.RimicConnectionListener, RimicLogger, BluetoothScoReceiver.Listener {
 
     static {
         // Use Spongy Castle for crypto implementation so we can create and manage PKCS #12 (.p12) certificates.
@@ -139,9 +139,9 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
 
     private PowerManager.WakeLock mWakeLock;
     private Handler mHandler;
-    private HumlaCallbacks mCallbacks;
+    private RimicCallbacks mCallbacks;
 
-    private HumlaConnection mConnection;
+    private RimicConnection mConnection;
     private ConnectionState mConnectionState;
     private ModelHandler mModelHandler;
     private AudioHandler mAudioHandler;
@@ -251,9 +251,9 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     public void onCreate() {
         super.onCreate();
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Humla:HumlaService");
+        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Rimic:RimicService");
         mHandler = new Handler(getMainLooper());
-        mCallbacks = new HumlaCallbacks();
+        mCallbacks = new RimicCallbacks();
         mAudioBuilder = new AudioHandler.Builder()
                 .setContext(this)
                 .setLogger(this)
@@ -275,7 +275,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     }
 
     public IBinder onBind(Intent intent) {
-        return new HumlaBinder(this);
+        return new RimicBinder(this);
     }
 
     protected void connect() {
@@ -285,7 +285,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
             mVoiceTargetId = 0;
             mWhisperTargetList.clear();
 
-            mConnection = new HumlaConnection(this);
+            mConnection = new RimicConnection(this);
             mConnection.setForceTCP(mForceTcp);
             mConnection.setUseTor(mUseTor);
             mConnection.setKeys(mCertificate, mCertificatePassword);
@@ -300,7 +300,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
             mCallbacks.onConnecting();
 
             mConnection.connect(mServer.getSrvHost(), mServer.getSrvPort());
-        } catch (HumlaException e) {
+        } catch (RimicException e) {
             e.printStackTrace();
             mCallbacks.onDisconnected(e);
         }
@@ -317,7 +317,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     }
 
     /**
-     * @return true if Humla has received the ServerSync message, indicating synchronization with
+     * @return true if Rimic has received the ServerSync message, indicating synchronization with
      * the server's model and settings. This is the main state of the service.
      */
     public boolean isSynchronized() {
@@ -342,8 +342,8 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         auth.setOpus(mUseOpus);
         auth.addAllTokens(mAccessTokens);
 
-        mConnection.sendTCPMessage(version.build(), HumlaTCPMessageType.Version);
-        mConnection.sendTCPMessage(auth.build(), HumlaTCPMessageType.Authenticate);
+        mConnection.sendTCPMessage(version.build(), RimicTCPMessageType.Version);
+        mConnection.sendTCPMessage(auth.build(), RimicTCPMessageType.Authenticate);
     }
 
     @Override
@@ -355,7 +355,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
 
         // TODO hackish, but this seems to happen?!
         if (mModelHandler == null) {
-            Log.e(Constants.TAG, "Error in HumlaService.onConnectionSynchronized: mAudioHandler is null");
+            Log.e(Constants.TAG, "Error in RimicService.onConnectionSynchronized: mAudioHandler is null");
             return;
         }
 
@@ -387,14 +387,14 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     }
 
     @Override
-    public void onConnectionDisconnected(HumlaException e) {
+    public void onConnectionDisconnected(RimicException e) {
         if (e != null) {
             Log.e(Constants.TAG, "Error: " + e.getMessage() +
                     " (reason: " + e.getReason().name() + ")");
             mConnectionState = ConnectionState.CONNECTION_LOST;
 
             setReconnecting(mAutoReconnect
-                    && e.getReason() == HumlaException.HumlaDisconnectReason.CONNECTION_ERROR);
+                    && e.getReason() == RimicException.RimicDisconnectReason.CONNECTION_ERROR);
         } else {
             Log.v(Constants.TAG, "Disconnected");
             mConnectionState = ConnectionState.DISCONNECTED;
@@ -507,11 +507,11 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     }
 
     /**
-     * Loads all defined settings from the given bundle into the HumlaService.
+     * Loads all defined settings from the given bundle into the RimicService.
      * Some settings may only take effect after a reconnect.
      * @param extras A bundle with settings.
      * @return true if a reconnect is required for changes to take effect.
-     * @see bo.htakey.rimic.HumlaService
+     * @see bo.htakey.rimic.RimicService
      */
     public boolean configureExtras(Bundle extras) throws AudioException {
         boolean reconnectNeeded = false;
@@ -662,9 +662,9 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
      * Exposes the current connection. The current connection is set once an attempt to connect to
      * a server is made, and remains set until a subsequent connection. It remains available
      * after disconnection to provide information regarding the terminated connection.
-     * @return The active {@link HumlaConnection}.
+     * @return The active {@link RimicConnection}.
      */
-    public HumlaConnection getConnection() {
+    public RimicConnection getConnection() {
         return mConnection;
     }
 
@@ -705,13 +705,13 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     }
 
     @Override
-    public HumlaService.ConnectionState getConnectionState() {
+    public RimicService.ConnectionState getConnectionState() {
         return mConnectionState;
     }
 
     @Override
-    public HumlaException getConnectionError() {
-        HumlaConnection connection = getConnection();
+    public RimicException getConnectionError() {
+        RimicConnection connection = getConnection();
         return connection != null ? connection.getError() : null;
     }
 
@@ -731,9 +731,9 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     }
 
     @Override
-    public IHumlaSession getSession() throws HumlaDisconnectedException {
+    public IRimicSession getSession() throws RimicDisconnectedException {
         if (mConnectionState != ConnectionState.CONNECTED)
-            throw new HumlaDisconnectedException();
+            throw new RimicDisconnectedException();
         return this;
     }
 
@@ -873,7 +873,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     }
 
     @Override
-    public HumlaUDPMessageType getCodec() {
+    public RimicUDPMessageType getCodec() {
         try {
             return getConnection().getCodec();
         } catch (NotSynchronizedException e) {
@@ -928,7 +928,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         Mumble.UserState.Builder usb = Mumble.UserState.newBuilder();
         usb.setSession(session);
         usb.setChannelId(channel);
-        getConnection().sendTCPMessage(usb.build(), HumlaTCPMessageType.UserState);
+        getConnection().sendTCPMessage(usb.build(), RimicTCPMessageType.UserState);
     }
 
     @Override
@@ -939,7 +939,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         csb.setDescription(description);
         csb.setPosition(position);
         csb.setTemporary(temporary);
-        getConnection().sendTCPMessage(csb.build(), HumlaTCPMessageType.ChannelState);
+        getConnection().sendTCPMessage(csb.build(), RimicTCPMessageType.ChannelState);
     }
 
     @Override
@@ -961,28 +961,28 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
     public void requestPermissions(int channel) {
         Mumble.PermissionQuery.Builder pqb = Mumble.PermissionQuery.newBuilder();
         pqb.setChannelId(channel);
-        getConnection().sendTCPMessage(pqb.build(), HumlaTCPMessageType.PermissionQuery);
+        getConnection().sendTCPMessage(pqb.build(), RimicTCPMessageType.PermissionQuery);
     }
 
     @Override
     public void requestComment(int session) {
         Mumble.RequestBlob.Builder rbb = Mumble.RequestBlob.newBuilder();
         rbb.addSessionComment(session);
-        getConnection().sendTCPMessage(rbb.build(), HumlaTCPMessageType.RequestBlob);
+        getConnection().sendTCPMessage(rbb.build(), RimicTCPMessageType.RequestBlob);
     }
 
     @Override
     public void requestAvatar(int session) {
         Mumble.RequestBlob.Builder rbb = Mumble.RequestBlob.newBuilder();
         rbb.addSessionTexture(session);
-        getConnection().sendTCPMessage(rbb.build(), HumlaTCPMessageType.RequestBlob);
+        getConnection().sendTCPMessage(rbb.build(), RimicTCPMessageType.RequestBlob);
     }
 
     @Override
     public void requestChannelDescription(int channel) {
         Mumble.RequestBlob.Builder rbb = Mumble.RequestBlob.newBuilder();
         rbb.addChannelDescription(channel);
-        getConnection().sendTCPMessage(rbb.build(), HumlaTCPMessageType.RequestBlob);
+        getConnection().sendTCPMessage(rbb.build(), RimicTCPMessageType.RequestBlob);
     }
 
     @Override
@@ -990,7 +990,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         Mumble.UserState.Builder usb = Mumble.UserState.newBuilder();
         usb.setSession(session);
         usb.setUserId(0);
-        getConnection().sendTCPMessage(usb.build(), HumlaTCPMessageType.UserState);
+        getConnection().sendTCPMessage(usb.build(), RimicTCPMessageType.UserState);
     }
 
     @Override
@@ -999,7 +999,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         urb.setSession(session);
         urb.setReason(reason);
         urb.setBan(ban);
-        getConnection().sendTCPMessage(urb.build(), HumlaTCPMessageType.UserRemove);
+        getConnection().sendTCPMessage(urb.build(), RimicTCPMessageType.UserRemove);
     }
 
     @Override
@@ -1011,7 +1011,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
             Mumble.TextMessage.Builder tmb = Mumble.TextMessage.newBuilder();
             tmb.addSession(session);
             tmb.setMessage(message);
-            getConnection().sendTCPMessage(tmb.build(), HumlaTCPMessageType.TextMessage);
+            getConnection().sendTCPMessage(tmb.build(), RimicTCPMessageType.TextMessage);
 
             User self = getModelHandler().getUser(getSessionId());
             User user = getModelHandler().getUser(session);
@@ -1033,7 +1033,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
             if (tree) tmb.addTreeId(channel);
             else tmb.addChannelId(channel);
             tmb.setMessage(message);
-            getConnection().sendTCPMessage(tmb.build(), HumlaTCPMessageType.TextMessage);
+            getConnection().sendTCPMessage(tmb.build(), RimicTCPMessageType.TextMessage);
 
             User self = getModelHandler().getUser(getSessionId());
             Channel targetChannel = getModelHandler().getChannel(channel);
@@ -1050,7 +1050,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         Mumble.UserState.Builder usb = Mumble.UserState.newBuilder();
         usb.setSession(session);
         usb.setComment(comment);
-        getConnection().sendTCPMessage(usb.build(), HumlaTCPMessageType.UserState);
+        getConnection().sendTCPMessage(usb.build(), RimicTCPMessageType.UserState);
     }
 
     @Override
@@ -1058,14 +1058,14 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         Mumble.UserState.Builder usb = Mumble.UserState.newBuilder();
         usb.setSession(session);
         usb.setPrioritySpeaker(priority);
-        getConnection().sendTCPMessage(usb.build(), HumlaTCPMessageType.UserState);
+        getConnection().sendTCPMessage(usb.build(), RimicTCPMessageType.UserState);
     }
 
     @Override
     public void removeChannel(int channel) {
         Mumble.ChannelRemove.Builder crb = Mumble.ChannelRemove.newBuilder();
         crb.setChannelId(channel);
-        getConnection().sendTCPMessage(crb.build(), HumlaTCPMessageType.ChannelRemove);
+        getConnection().sendTCPMessage(crb.build(), RimicTCPMessageType.ChannelRemove);
     }
 
     @Override
@@ -1075,7 +1075,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         usb.setMute(mute);
         usb.setDeaf(deaf);
         if (!mute) usb.setSuppress(false);
-        getConnection().sendTCPMessage(usb.build(), HumlaTCPMessageType.UserState);
+        getConnection().sendTCPMessage(usb.build(), RimicTCPMessageType.UserState);
     }
 
     @Override
@@ -1083,14 +1083,14 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         Mumble.UserState.Builder usb = Mumble.UserState.newBuilder();
         usb.setSelfMute(mute);
         usb.setSelfDeaf(deaf);
-        getConnection().sendTCPMessage(usb.build(), HumlaTCPMessageType.UserState);
+        getConnection().sendTCPMessage(usb.build(), RimicTCPMessageType.UserState);
     }
 
-    public void registerObserver(IHumlaObserver observer) {
+    public void registerObserver(IRimicObserver observer) {
         mCallbacks.registerObserver(observer);
     }
 
-    public void unregisterObserver(IHumlaObserver observer) {
+    public void unregisterObserver(IRimicObserver observer) {
         mCallbacks.unregisterObserver(observer);
     }
 
@@ -1104,7 +1104,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         Mumble.ChannelState.Builder csb = Mumble.ChannelState.newBuilder();
         csb.setChannelId(channelA.getId());
         csb.addLinksAdd(channelB.getId());
-        getConnection().sendTCPMessage(csb.build(), HumlaTCPMessageType.ChannelState);
+        getConnection().sendTCPMessage(csb.build(), RimicTCPMessageType.ChannelState);
     }
 
     @Override
@@ -1112,7 +1112,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         Mumble.ChannelState.Builder csb = Mumble.ChannelState.newBuilder();
         csb.setChannelId(channelA.getId());
         csb.addLinksRemove(channelB.getId());
-        getConnection().sendTCPMessage(csb.build(), HumlaTCPMessageType.ChannelState);
+        getConnection().sendTCPMessage(csb.build(), RimicTCPMessageType.ChannelState);
     }
 
     @Override
@@ -1122,7 +1122,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         for (IChannel linked : channel.getLinks()) {
             csb.addLinksRemove(linked.getId());
         }
-        getConnection().sendTCPMessage(csb.build(), HumlaTCPMessageType.ChannelState);
+        getConnection().sendTCPMessage(csb.build(), RimicTCPMessageType.ChannelState);
     }
 
     @Override
@@ -1136,7 +1136,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
         Mumble.VoiceTarget.Builder vtb = Mumble.VoiceTarget.newBuilder();
         vtb.setId(id);
         vtb.addTargets(voiceTarget);
-        getConnection().sendTCPMessage(vtb.build(), HumlaTCPMessageType.VoiceTarget);
+        getConnection().sendTCPMessage(vtb.build(), RimicTCPMessageType.VoiceTarget);
         return id;
     }
 
@@ -1178,7 +1178,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
      */
     public enum ConnectionState {
         /**
-         * The default state of Humla, before connection to a server and after graceful/expected
+         * The default state of Rimic, before connection to a server and after graceful/expected
          * disconnection from a server.
          */
         DISCONNECTED,
@@ -1187,26 +1187,26 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
          */
         CONNECTING,
         /**
-         * Humla has received all data necessary for normal protocol communication with the server.
+         * Rimic has received all data necessary for normal protocol communication with the server.
          */
         CONNECTED,
         /**
          * The connection was lost due to either a kick/ban or socket I/O error.
-         * Humla may be reconnecting in this state.
+         * Rimic may be reconnecting in this state.
          * @see #isReconnecting()
          * @see #cancelReconnect()
          */
         CONNECTION_LOST
     }
 
-    public static class HumlaBinder extends Binder {
-        private final IHumlaService mService;
+    public static class RimicBinder extends Binder {
+        private final IRimicService mService;
 
-        private HumlaBinder(IHumlaService service) {
+        private RimicBinder(IRimicService service) {
             mService = service;
         }
 
-        public IHumlaService getService() {
+        public IRimicService getService() {
             return mService;
         }
     }

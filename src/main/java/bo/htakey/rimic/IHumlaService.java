@@ -18,14 +18,14 @@
 package bo.htakey.rimic;
 
 import bo.htakey.rimic.model.Server;
-import bo.htakey.rimic.util.HumlaDisconnectedException;
-import bo.htakey.rimic.util.HumlaException;
-import bo.htakey.rimic.util.IHumlaObserver;
+import bo.htakey.rimic.util.RimicDisconnectedException;
+import bo.htakey.rimic.util.RimicException;
+import bo.htakey.rimic.util.IRimicObserver;
 
 /**
- * A public interface for clients to communicate with a {@link HumlaService}.
+ * A public interface for clients to communicate with a {@link RimicService}.
  * The long-term goal for this class is to migrate of the complexity out of this class into a
- * HumlaProtocol class that is owned by a {@link bo.htakey.rimic.net.HumlaConnection}.
+ * RimicProtocol class that is owned by a {@link bo.htakey.rimic.net.RimicConnection}.
  * <br><br>
  * Calls are not guaranteed to be thread-safe, so only call the binder from the main thread.
  * Service state changes related to connection state are only guaranteed to work if isConnected()
@@ -34,10 +34,10 @@ import bo.htakey.rimic.util.IHumlaObserver;
  * If not explicitly stated in the method documentation, any call that depends on connection state
  * will throw IllegalStateException if disconnected or not synchronized.
  */
-public interface IHumlaService {
-    void registerObserver(IHumlaObserver observer);
+public interface IRimicService {
+    void registerObserver(IRimicObserver observer);
 
-    void unregisterObserver(IHumlaObserver observer);
+    void unregisterObserver(IRimicObserver observer);
 
     /**
      * @return true if handshaking with the server has completed.
@@ -51,19 +51,19 @@ public interface IHumlaService {
 
     /**
      * Returns the current connection state of the service.
-     * @return one of {@link HumlaService.ConnectionState}.
+     * @return one of {@link RimicService.ConnectionState}.
      */
-    HumlaService.ConnectionState getConnectionState();
+    RimicService.ConnectionState getConnectionState();
 
     /**
-     * If the {@link HumlaService} disconnected due to an error, returns that error.
+     * If the {@link RimicService} disconnected due to an error, returns that error.
      * @return The error causing disconnection. If the last disconnection was successful or a
      *         connection has yet to be established, returns null.
      */
-    HumlaException getConnectionError();
+    RimicException getConnectionError();
 
     /**
-     * Returns the reconnection state of the {@link HumlaService}.
+     * Returns the reconnection state of the {@link RimicService}.
      * @return true if the service will attempt to automatically reconnect in the future.
      */
     boolean isReconnecting();
@@ -74,15 +74,15 @@ public interface IHumlaService {
     void cancelReconnect();
 
     /**
-     * @return the server that Humla is currently connected to, was connected to, or will attempt connection to.
+     * @return the server that Rimic is currently connected to, was connected to, or will attempt connection to.
      */
     Server getTargetServer();
 
     /**
      * Returns the active session with the remote, or throws an exception if no session is currently
-     * active. This can be checked using {@link IHumlaService#isConnected()}.
+     * active. This can be checked using {@link IRimicService#isConnected()}.
      * @return the active session.
-     * @throws HumlaDisconnectedException if the connection state is not CONNECTED.
+     * @throws RimicDisconnectedException if the connection state is not CONNECTED.
      */
-    IHumlaSession getSession() throws HumlaDisconnectedException;
+    IRimicSession getSession() throws RimicDisconnectedException;
 }

@@ -25,7 +25,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application android:allowBackup="true">
-        <service android:name=".HumlaService"
+        <service android:name=".RimicService"
                  android:exported="true">
             <intent-filter>
                 <action android:name="bo.htakey.rimic.ACTION_CONNECT"/>
