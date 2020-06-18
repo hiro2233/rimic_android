@@ -568,6 +568,6 @@ message SuggestConfig {
 	// True if the administrator suggests push to talk to be used on this server.
 	optional bool push_to_talk = 3;
 }
-option java_package = "se.lublin.humla.protobuf";
+option java_package = "bo.htakey.rimic.protobuf";
 option java_outer_classname = "Mumble";
 option java_multiple_files = false;

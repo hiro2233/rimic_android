@@ -1,13 +1,13 @@
-package se.lublin.humla.test;
+package bo.htakey.rimic.test;
 
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import se.lublin.humla.audio.BasicClippingShortMixer;
-import se.lublin.humla.audio.IAudioMixer;
-import se.lublin.humla.audio.IAudioMixerSource;
+import bo.htakey.rimic.audio.BasicClippingShortMixer;
+import bo.htakey.rimic.audio.IAudioMixer;
+import bo.htakey.rimic.audio.IAudioMixerSource;
 
 /**
  * Created by andrew on 16/07/15.

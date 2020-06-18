@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio.encoder;
+package bo.htakey.rimic.audio.encoder;
 
 import com.googlecode.javacpp.IntPointer;
 import com.googlecode.javacpp.Pointer;
@@ -23,9 +23,9 @@ import com.googlecode.javacpp.Pointer;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 
-import se.lublin.humla.audio.javacpp.CELT7;
-import se.lublin.humla.exception.NativeAudioException;
-import se.lublin.humla.net.PacketBuffer;
+import bo.htakey.rimic.audio.javacpp.CELT7;
+import bo.htakey.rimic.exception.NativeAudioException;
+import bo.htakey.rimic.net.PacketBuffer;
 
 /**
 * Created by andrew on 08/12/14.

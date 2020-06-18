@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio;
+package bo.htakey.rimic.audio;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.util.Log;
 
-import se.lublin.humla.Constants;
-import se.lublin.humla.exception.AudioInitializationException;
-import se.lublin.humla.exception.NativeAudioException;
-import se.lublin.humla.protocol.AudioHandler;
+import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.exception.AudioInitializationException;
+import bo.htakey.rimic.exception.NativeAudioException;
+import bo.htakey.rimic.protocol.AudioHandler;
 
 /**
  * Created by andrew on 23/08/13.

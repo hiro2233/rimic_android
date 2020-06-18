@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.util;
+package bo.htakey.rimic.util;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import se.lublin.humla.protobuf.Mumble;
+import bo.htakey.rimic.protobuf.Mumble;
 
 /**
  * Created by andrew on 14/07/13.

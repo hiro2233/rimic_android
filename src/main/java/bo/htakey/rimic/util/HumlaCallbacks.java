@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.util;
+package bo.htakey.rimic.util;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import se.lublin.humla.model.IChannel;
-import se.lublin.humla.model.IMessage;
-import se.lublin.humla.model.IUser;
+import bo.htakey.rimic.model.IChannel;
+import bo.htakey.rimic.model.IMessage;
+import bo.htakey.rimic.model.IUser;
 
 /**
  * A composite wrapper around Humla observers to easily broadcast to each observer.

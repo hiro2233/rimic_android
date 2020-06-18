@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.net;
+package bo.htakey.rimic.net;
 
 import android.os.Handler;
 import android.util.Log;
@@ -33,7 +33,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 
-import se.lublin.humla.Constants;
+import bo.htakey.rimic.Constants;
 
 /**
  * Class to maintain and receive packets from the UDP connection to a Mumble server.

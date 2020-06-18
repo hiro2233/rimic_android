@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio;
+package bo.htakey.rimic.audio;
 
 import android.media.AudioFormat;
 import android.media.AudioTrack;
@@ -36,14 +36,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import se.lublin.humla.Constants;
-import se.lublin.humla.exception.AudioInitializationException;
-import se.lublin.humla.exception.NativeAudioException;
-import se.lublin.humla.model.TalkState;
-import se.lublin.humla.model.User;
-import se.lublin.humla.net.HumlaUDPMessageType;
-import se.lublin.humla.net.PacketBuffer;
-import se.lublin.humla.protocol.AudioHandler;
+import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.exception.AudioInitializationException;
+import bo.htakey.rimic.exception.NativeAudioException;
+import bo.htakey.rimic.model.TalkState;
+import bo.htakey.rimic.model.User;
+import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.PacketBuffer;
+import bo.htakey.rimic.protocol.AudioHandler;
 
 /**
  * Created by andrew on 16/07/13.

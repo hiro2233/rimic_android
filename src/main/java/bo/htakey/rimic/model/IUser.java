@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.model;
+package bo.htakey.rimic.model;
 
 /**
  * Created by andrew on 15/10/15.

@@ -22,7 +22,7 @@ EOF
 cat >>"$protof" "$mumblerepo/$protof"
 
 cat <<EOF >>"$protof"
-option java_package = "se.lublin.humla.protobuf";
+option java_package = "bo.htakey.rimic.protobuf";
 option java_outer_classname = "Mumble";
 option java_multiple_files = false;
 EOF

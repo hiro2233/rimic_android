@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.net;
+package bo.htakey.rimic.net;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -24,7 +24,7 @@ import android.util.Log;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import se.lublin.humla.Constants;
+import bo.htakey.rimic.Constants;
 
 /**
  * Base class for TCP/UDP protocol implementations.

@@ -1,13 +1,13 @@
-package se.lublin.humla;
+package bo.htakey.rimic;
 
 import java.util.List;
 
-import se.lublin.humla.model.IChannel;
-import se.lublin.humla.model.IUser;
-import se.lublin.humla.model.Message;
-import se.lublin.humla.model.WhisperTarget;
-import se.lublin.humla.net.HumlaUDPMessageType;
-import se.lublin.humla.util.VoiceTargetMode;
+import bo.htakey.rimic.model.IChannel;
+import bo.htakey.rimic.model.IUser;
+import bo.htakey.rimic.model.Message;
+import bo.htakey.rimic.model.WhisperTarget;
+import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.util.VoiceTargetMode;
 
 /**
  * An interface representing a live connection to the server.

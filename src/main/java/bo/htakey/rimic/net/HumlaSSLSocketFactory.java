@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.net;
+package bo.htakey.rimic.net;
 
 import android.util.Log;
 
@@ -41,7 +41,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import se.lublin.humla.Constants;
+import bo.htakey.rimic.Constants;
 
 public class HumlaSSLSocketFactory {
     private SSLContext mContext;

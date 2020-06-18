@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.model;
+package bo.htakey.rimic.model;
 
 /**
  * A simple implementation of a fixed-size whisper target list using a bit vector.

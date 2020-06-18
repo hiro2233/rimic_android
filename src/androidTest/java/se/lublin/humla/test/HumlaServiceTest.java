@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.test;
+package bo.htakey.rimic.test;
 
 import android.content.Intent;
 import android.os.RemoteException;
 import android.test.ServiceTestCase;
 
-import se.lublin.humla.HumlaService;
-import se.lublin.humla.IHumlaService;
-import se.lublin.humla.model.Server;
+import bo.htakey.rimic.HumlaService;
+import bo.htakey.rimic.IHumlaService;
+import bo.htakey.rimic.model.Server;
 
 /**
  * Tests to ensure the integrity of {@link HumlaService}'s state.

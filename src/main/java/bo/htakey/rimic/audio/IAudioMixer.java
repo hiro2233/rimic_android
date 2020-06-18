@@ -1,4 +1,4 @@
-package se.lublin.humla.audio;
+package bo.htakey.rimic.audio;
 
 import java.util.Collection;
 

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.model;
+package bo.htakey.rimic.model;
 
-import se.lublin.humla.protobuf.Mumble;
+import bo.htakey.rimic.protobuf.Mumble;
 
 /**
  * An abstraction around a channel whisper target.

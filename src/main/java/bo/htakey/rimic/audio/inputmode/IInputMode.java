@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio.inputmode;
+package bo.htakey.rimic.audio.inputmode;
 
 /**
  * A talk state engine, providing information regarding when it is appropriate to send audio.

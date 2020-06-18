@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio;
+package bo.htakey.rimic.audio;
 
 import com.googlecode.javacpp.IntPointer;
 
@@ -27,16 +27,16 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import se.lublin.humla.audio.javacpp.CELT11;
-import se.lublin.humla.audio.javacpp.CELT7;
-import se.lublin.humla.audio.javacpp.Opus;
-import se.lublin.humla.audio.javacpp.Speex;
-import se.lublin.humla.exception.NativeAudioException;
-import se.lublin.humla.model.TalkState;
-import se.lublin.humla.model.User;
-import se.lublin.humla.net.HumlaUDPMessageType;
-import se.lublin.humla.net.PacketBuffer;
-import se.lublin.humla.protocol.AudioHandler;
+import bo.htakey.rimic.audio.javacpp.CELT11;
+import bo.htakey.rimic.audio.javacpp.CELT7;
+import bo.htakey.rimic.audio.javacpp.Opus;
+import bo.htakey.rimic.audio.javacpp.Speex;
+import bo.htakey.rimic.exception.NativeAudioException;
+import bo.htakey.rimic.model.TalkState;
+import bo.htakey.rimic.model.User;
+import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.PacketBuffer;
+import bo.htakey.rimic.protocol.AudioHandler;
 
 /**
  * Created by andrew on 16/07/13.

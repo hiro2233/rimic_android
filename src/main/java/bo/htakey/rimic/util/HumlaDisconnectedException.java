@@ -1,4 +1,4 @@
-package se.lublin.humla.util;
+package bo.htakey.rimic.util;
 
 /**
  * Called when a

@@ -1,4 +1,4 @@
-package se.lublin.humla.audio;
+package bo.htakey.rimic.audio;
 
 /**
  * A source for an {@link IAudioMixer}.

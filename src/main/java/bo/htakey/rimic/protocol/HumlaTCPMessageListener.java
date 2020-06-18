@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.protocol;
+package bo.htakey.rimic.protocol;
 
-import se.lublin.humla.protobuf.Mumble;
+import bo.htakey.rimic.protobuf.Mumble;
 
 public interface HumlaTCPMessageListener {
     public void messageAuthenticate(Mumble.Authenticate msg);

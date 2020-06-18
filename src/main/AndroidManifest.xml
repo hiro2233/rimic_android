@@ -16,7 +16,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="se.lublin.humla"
+    package="bo.htakey.rimic"
     android:versionCode="1"
     android:versionName="1.0">
 
@@ -28,8 +28,8 @@
         <service android:name=".HumlaService"
                  android:exported="true">
             <intent-filter>
-                <action android:name="se.lublin.humla.ACTION_CONNECT"/>
-                <action android:name="se.lublin.humla.ACTION_DISCONNECT"/>
+                <action android:name="bo.htakey.rimic.ACTION_CONNECT"/>
+                <action android:name="bo.htakey.rimic.ACTION_DISCONNECT"/>
             </intent-filter>
         </service>
     </application>

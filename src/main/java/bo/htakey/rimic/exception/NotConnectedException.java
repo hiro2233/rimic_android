@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.exception;
+package bo.htakey.rimic.exception;
 
 /**
  * Thrown when a Humla connection has not yet been established.

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio.javacpp;
+package bo.htakey.rimic.audio.javacpp;
 
 import com.googlecode.javacpp.IntPointer;
 import com.googlecode.javacpp.Loader;
@@ -28,8 +28,8 @@ import com.googlecode.javacpp.annotation.Platform;
 
 import java.nio.ByteBuffer;
 
-import se.lublin.humla.audio.IDecoder;
-import se.lublin.humla.exception.NativeAudioException;
+import bo.htakey.rimic.audio.IDecoder;
+import bo.htakey.rimic.exception.NativeAudioException;
 
 /**
  * JavaCPP interface for Speex JNI.

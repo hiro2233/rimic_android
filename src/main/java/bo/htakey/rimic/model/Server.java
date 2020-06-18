@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.model;
+package bo.htakey.rimic.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import se.lublin.humla.Constants;
+import bo.htakey.rimic.Constants;
 
 public class Server implements Parcelable {
     private long mId;
