@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.net;
+package bo.htakey.rimic.net;
 
 /**
  * Message types pulled from the Mumble project's 'Message.h' for protocol version 1.2.4.

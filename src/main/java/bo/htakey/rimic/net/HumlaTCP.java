@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.net;
+package bo.htakey.rimic.net;
 
 import android.net.SSLCertificateSocketFactory;
 import android.os.Build;
@@ -34,8 +34,8 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocket;
 
-import se.lublin.humla.Constants;
-import se.lublin.humla.util.HumlaException;
+import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.util.HumlaException;
 
 /**
  * Class to maintain and interface with the TCP connection to a Mumble server.

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio.inputmode;
+package bo.htakey.rimic.audio.inputmode;
 
 import android.util.Log;
 
@@ -23,7 +23,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import se.lublin.humla.Constants;
+import bo.htakey.rimic.Constants;
 
 /**
  * An input mode that depends on a toggle, such as push to talk.

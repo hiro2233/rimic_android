@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio;
+package bo.htakey.rimic.audio;
 
 /**
  * Created by andrew on 23/04/14.

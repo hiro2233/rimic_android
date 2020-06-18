@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.protocol;
+package bo.htakey.rimic.protocol;
 
 import android.content.Context;
 import android.util.Log;
@@ -28,15 +28,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import se.lublin.humla.Constants;
-import se.lublin.humla.R;
-import se.lublin.humla.model.Channel;
-import se.lublin.humla.model.Message;
-import se.lublin.humla.model.User;
-import se.lublin.humla.protobuf.Mumble;
-import se.lublin.humla.util.HumlaLogger;
-import se.lublin.humla.util.IHumlaObserver;
-import se.lublin.humla.util.MessageFormatter;
+import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.R;
+import bo.htakey.rimic.model.Channel;
+import bo.htakey.rimic.model.Message;
+import bo.htakey.rimic.model.User;
+import bo.htakey.rimic.protobuf.Mumble;
+import bo.htakey.rimic.util.HumlaLogger;
+import bo.htakey.rimic.util.IHumlaObserver;
+import bo.htakey.rimic.util.MessageFormatter;
 
 /**
  * Handles network messages related to the user-channel tree model.

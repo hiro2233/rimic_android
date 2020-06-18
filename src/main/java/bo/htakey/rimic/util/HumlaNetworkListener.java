@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.util;
+package bo.htakey.rimic.util;
 
-import se.lublin.humla.net.HumlaUDPMessageType;
-import se.lublin.humla.protobuf.Mumble;
-import se.lublin.humla.protocol.HumlaTCPMessageListener;
-import se.lublin.humla.protocol.HumlaUDPMessageListener;
+import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.protobuf.Mumble;
+import bo.htakey.rimic.protocol.HumlaTCPMessageListener;
+import bo.htakey.rimic.protocol.HumlaUDPMessageListener;
 
 /**
  * Created by andrew on 23/04/14.

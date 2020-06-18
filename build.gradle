@@ -64,7 +64,7 @@ android {
     sourceSets.main.jni.srcDirs = [] // Disable NDK build support until it supports multiple modules.
 
     defaultConfig {
-        testApplicationId "se.lublin.humla.test"
+        testApplicationId "bo.htakey.rimic.test"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
         minSdkVersion 14
         targetSdkVersion 29

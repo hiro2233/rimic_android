@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio;
+package bo.htakey.rimic.audio;
 
 import java.nio.ByteBuffer;
 
-import se.lublin.humla.exception.NativeAudioException;
+import bo.htakey.rimic.exception.NativeAudioException;
 
 /**
  * Created by andrew on 07/03/14.
@@ -32,7 +32,7 @@ public interface IDecoder {
      * @param output An initialized output array at least frameSize for float PCM data.
      * @param frameSize The maximum frame size possible.
      * @return The number of decoded samples.
-     * @throws se.lublin.humla.exception.NativeAudioException if encoding failed.
+     * @throws bo.htakey.rimic.exception.NativeAudioException if encoding failed.
      */
     public int decodeFloat(ByteBuffer input, int inputSize, float[] output, int frameSize) throws NativeAudioException;
 

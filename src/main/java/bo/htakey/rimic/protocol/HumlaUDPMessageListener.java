@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.protocol;
+package bo.htakey.rimic.protocol;
 
-import se.lublin.humla.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.HumlaUDPMessageType;
 
 /**
  * Created by andrew on 21/01/14.

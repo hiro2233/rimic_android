@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla;
+package bo.htakey.rimic;
 
-import se.lublin.humla.model.Server;
-import se.lublin.humla.util.HumlaDisconnectedException;
-import se.lublin.humla.util.HumlaException;
-import se.lublin.humla.util.IHumlaObserver;
+import bo.htakey.rimic.model.Server;
+import bo.htakey.rimic.util.HumlaDisconnectedException;
+import bo.htakey.rimic.util.HumlaException;
+import bo.htakey.rimic.util.IHumlaObserver;
 
 /**
  * A public interface for clients to communicate with a {@link HumlaService}.
  * The long-term goal for this class is to migrate of the complexity out of this class into a
- * HumlaProtocol class that is owned by a {@link se.lublin.humla.net.HumlaConnection}.
+ * HumlaProtocol class that is owned by a {@link bo.htakey.rimic.net.HumlaConnection}.
  * <br><br>
  * Calls are not guaranteed to be thread-safe, so only call the binder from the main thread.
  * Service state changes related to connection state are only guaranteed to work if isConnected()

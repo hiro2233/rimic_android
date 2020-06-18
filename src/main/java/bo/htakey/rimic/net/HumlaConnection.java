@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.net;
+package bo.htakey.rimic.net;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -51,13 +51,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import se.lublin.humla.Constants;
-import se.lublin.humla.exception.NotConnectedException;
-import se.lublin.humla.exception.NotSynchronizedException;
-import se.lublin.humla.protobuf.Mumble;
-import se.lublin.humla.protocol.HumlaTCPMessageListener;
-import se.lublin.humla.protocol.HumlaUDPMessageListener;
-import se.lublin.humla.util.HumlaException;
+import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.exception.NotConnectedException;
+import bo.htakey.rimic.exception.NotSynchronizedException;
+import bo.htakey.rimic.protobuf.Mumble;
+import bo.htakey.rimic.protocol.HumlaTCPMessageListener;
+import bo.htakey.rimic.protocol.HumlaUDPMessageListener;
+import bo.htakey.rimic.util.HumlaException;
 
 public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP.UDPConnectionListener {
 

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.test;
+package bo.htakey.rimic.test;
 
 import junit.framework.TestCase;
 
-import se.lublin.humla.model.Channel;
-import se.lublin.humla.model.User;
+import bo.htakey.rimic.model.Channel;
+import bo.htakey.rimic.model.User;
 
 /**
  * Tests the Channel-User tree model.

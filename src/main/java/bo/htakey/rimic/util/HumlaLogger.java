@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.util;
+package bo.htakey.rimic.util;
 
 /**
  * An interface for reporting user-readable information.

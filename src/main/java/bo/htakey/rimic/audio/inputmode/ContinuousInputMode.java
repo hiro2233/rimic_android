@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.audio.inputmode;
+package bo.htakey.rimic.audio.inputmode;
 
 /**
  * An input mode that always transmits audio.

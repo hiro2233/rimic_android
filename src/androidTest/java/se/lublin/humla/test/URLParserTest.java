@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.test;
+package bo.htakey.rimic.test;
 
 import junit.framework.TestCase;
 
 import java.net.MalformedURLException;
 
-import se.lublin.humla.Constants;
-import se.lublin.humla.model.Server;
-import se.lublin.humla.util.MumbleURLParser;
+import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.model.Server;
+import bo.htakey.rimic.util.MumbleURLParser;
 
 /**
  * Tests the Mumble URL parser.

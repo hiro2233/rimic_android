@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.util;
+package bo.htakey.rimic.util;
 
 import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import se.lublin.humla.Constants;
-import se.lublin.humla.model.Server;
+import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.model.Server;
 
 /**
  * An implementation of the Mumble URL scheme.

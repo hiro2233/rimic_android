@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla;
+package bo.htakey.rimic;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -38,37 +38,37 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.lublin.humla.audio.AudioOutput;
-import se.lublin.humla.audio.BluetoothScoReceiver;
-import se.lublin.humla.audio.inputmode.ActivityInputMode;
-import se.lublin.humla.audio.inputmode.ContinuousInputMode;
-import se.lublin.humla.audio.inputmode.IInputMode;
-import se.lublin.humla.audio.inputmode.ToggleInputMode;
-import se.lublin.humla.audio.javacpp.CELT7;
-import se.lublin.humla.exception.AudioException;
-import se.lublin.humla.exception.NotConnectedException;
-import se.lublin.humla.exception.NotSynchronizedException;
-import se.lublin.humla.model.Channel;
-import se.lublin.humla.model.IChannel;
-import se.lublin.humla.model.IUser;
-import se.lublin.humla.model.Message;
-import se.lublin.humla.model.Server;
-import se.lublin.humla.model.TalkState;
-import se.lublin.humla.model.User;
-import se.lublin.humla.model.WhisperTarget;
-import se.lublin.humla.model.WhisperTargetList;
-import se.lublin.humla.net.HumlaConnection;
-import se.lublin.humla.net.HumlaTCPMessageType;
-import se.lublin.humla.net.HumlaUDPMessageType;
-import se.lublin.humla.protobuf.Mumble;
-import se.lublin.humla.protocol.AudioHandler;
-import se.lublin.humla.protocol.ModelHandler;
-import se.lublin.humla.util.HumlaCallbacks;
-import se.lublin.humla.util.HumlaDisconnectedException;
-import se.lublin.humla.util.HumlaException;
-import se.lublin.humla.util.HumlaLogger;
-import se.lublin.humla.util.IHumlaObserver;
-import se.lublin.humla.util.VoiceTargetMode;
+import bo.htakey.rimic.audio.AudioOutput;
+import bo.htakey.rimic.audio.BluetoothScoReceiver;
+import bo.htakey.rimic.audio.inputmode.ActivityInputMode;
+import bo.htakey.rimic.audio.inputmode.ContinuousInputMode;
+import bo.htakey.rimic.audio.inputmode.IInputMode;
+import bo.htakey.rimic.audio.inputmode.ToggleInputMode;
+import bo.htakey.rimic.audio.javacpp.CELT7;
+import bo.htakey.rimic.exception.AudioException;
+import bo.htakey.rimic.exception.NotConnectedException;
+import bo.htakey.rimic.exception.NotSynchronizedException;
+import bo.htakey.rimic.model.Channel;
+import bo.htakey.rimic.model.IChannel;
+import bo.htakey.rimic.model.IUser;
+import bo.htakey.rimic.model.Message;
+import bo.htakey.rimic.model.Server;
+import bo.htakey.rimic.model.TalkState;
+import bo.htakey.rimic.model.User;
+import bo.htakey.rimic.model.WhisperTarget;
+import bo.htakey.rimic.model.WhisperTargetList;
+import bo.htakey.rimic.net.HumlaConnection;
+import bo.htakey.rimic.net.HumlaTCPMessageType;
+import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.protobuf.Mumble;
+import bo.htakey.rimic.protocol.AudioHandler;
+import bo.htakey.rimic.protocol.ModelHandler;
+import bo.htakey.rimic.util.HumlaCallbacks;
+import bo.htakey.rimic.util.HumlaDisconnectedException;
+import bo.htakey.rimic.util.HumlaException;
+import bo.htakey.rimic.util.HumlaLogger;
+import bo.htakey.rimic.util.IHumlaObserver;
+import bo.htakey.rimic.util.VoiceTargetMode;
 
 public class HumlaService extends Service implements IHumlaService, IHumlaSession, HumlaConnection.HumlaConnectionListener, HumlaLogger, BluetoothScoReceiver.Listener {
 
@@ -81,7 +81,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
      * An action to immediately connect to a given Mumble server.
      * Requires that {@link #EXTRAS_SERVER} is provided.
      */
-    public static final String ACTION_CONNECT = "se.lublin.humla.CONNECT";
+    public static final String ACTION_CONNECT = "bo.htakey.rimic.CONNECT";
 
     /** A {@link Server} specifying the server to connect to. */
     public static final String EXTRAS_SERVER = "server";
@@ -511,7 +511,7 @@ public class HumlaService extends Service implements IHumlaService, IHumlaSessio
      * Some settings may only take effect after a reconnect.
      * @param extras A bundle with settings.
      * @return true if a reconnect is required for changes to take effect.
-     * @see se.lublin.humla.HumlaService
+     * @see bo.htakey.rimic.HumlaService
      */
     public boolean configureExtras(Bundle extras) throws AudioException {
         boolean reconnectNeeded = false;

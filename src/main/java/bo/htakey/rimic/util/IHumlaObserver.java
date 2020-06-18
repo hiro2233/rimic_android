@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.util;
+package bo.htakey.rimic.util;
 
 import java.security.cert.X509Certificate;
 
-import se.lublin.humla.model.IChannel;
-import se.lublin.humla.model.IMessage;
-import se.lublin.humla.model.IUser;
+import bo.htakey.rimic.model.IChannel;
+import bo.htakey.rimic.model.IMessage;
+import bo.htakey.rimic.model.IUser;
 
 /**
  * Created by andrew on 18/10/15.

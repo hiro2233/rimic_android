@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package se.lublin.humla.test;
+package bo.htakey.rimic.test;
 
 import android.test.AndroidTestCase;
 
 import com.googlecode.javacpp.Loader;
 
-import se.lublin.humla.audio.encoder.CELT7Encoder;
-import se.lublin.humla.audio.encoder.IEncoder;
-import se.lublin.humla.audio.encoder.OpusEncoder;
-import se.lublin.humla.audio.javacpp.Opus;
-import se.lublin.humla.exception.NativeAudioException;
-import se.lublin.humla.net.PacketBuffer;
+import bo.htakey.rimic.audio.encoder.CELT7Encoder;
+import bo.htakey.rimic.audio.encoder.IEncoder;
+import bo.htakey.rimic.audio.encoder.OpusEncoder;
+import bo.htakey.rimic.audio.javacpp.Opus;
+import bo.htakey.rimic.exception.NativeAudioException;
+import bo.htakey.rimic.net.PacketBuffer;
 
 /**
  * This class tests the Opus and CELT encoders with blank PCM data.
