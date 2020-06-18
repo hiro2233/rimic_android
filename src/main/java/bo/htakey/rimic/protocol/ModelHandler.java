@@ -34,8 +34,8 @@ import bo.htakey.rimic.model.Channel;
 import bo.htakey.rimic.model.Message;
 import bo.htakey.rimic.model.User;
 import bo.htakey.rimic.protobuf.Mumble;
-import bo.htakey.rimic.util.HumlaLogger;
-import bo.htakey.rimic.util.IHumlaObserver;
+import bo.htakey.rimic.util.RimicLogger;
+import bo.htakey.rimic.util.IRimicObserver;
 import bo.htakey.rimic.util.MessageFormatter;
 
 /**
@@ -43,18 +43,18 @@ import bo.htakey.rimic.util.MessageFormatter;
  * This includes channels, users, messages, and permissions.
  * Created by andrew on 18/07/13.
  */
-public class ModelHandler extends HumlaTCPMessageListener.Stub {
+public class ModelHandler extends RimicTCPMessageListener.Stub {
     private final Context mContext;
     private final Map<Integer, Channel> mChannels;
     private final Map<Integer, User> mUsers;
     private final List<Integer> mLocalMuteHistory;
     private final List<Integer> mLocalIgnoreHistory;
-    private final IHumlaObserver mObserver;
-    private final HumlaLogger mLogger;
+    private final IRimicObserver mObserver;
+    private final RimicLogger mLogger;
     private int mPermissions;
     private int mSession;
 
-    public ModelHandler(Context context, IHumlaObserver observer, HumlaLogger logger,
+    public ModelHandler(Context context, IRimicObserver observer, RimicLogger logger,
                         @Nullable List<Integer> localMuteHistory,
                         @Nullable List<Integer> localIgnoreHistory) {
         mContext = context;

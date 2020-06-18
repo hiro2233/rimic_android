@@ -17,20 +17,20 @@
 
 package bo.htakey.rimic.protocol;
 
-import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.RimicUDPMessageType;
 
 /**
  * Created by andrew on 21/01/14.
  */
 
-public interface HumlaUDPMessageListener {
+public interface RimicUDPMessageListener {
 
     public void messageUDPPing(byte[] data);
-    public void messageVoiceData(byte[] data, HumlaUDPMessageType messageType);
+    public void messageVoiceData(byte[] data, RimicUDPMessageType messageType);
 
-    public static class Stub implements HumlaUDPMessageListener {
+    public static class Stub implements RimicUDPMessageListener {
 
         public void messageUDPPing(byte[] data) {}
-        public void messageVoiceData(byte[] data, HumlaUDPMessageType messageType) {}
+        public void messageVoiceData(byte[] data, RimicUDPMessageType messageType) {}
     }
 }

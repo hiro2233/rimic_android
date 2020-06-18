@@ -20,7 +20,7 @@ package bo.htakey.rimic.net;
 /**
  * Message types pulled from the Mumble project's 'Message.h' for protocol version 1.2.4.
  */
-public enum HumlaTCPMessageType {
+public enum RimicTCPMessageType {
     Version,
     UDPTunnel,
     Authenticate,

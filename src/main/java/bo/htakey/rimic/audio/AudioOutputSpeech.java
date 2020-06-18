@@ -34,7 +34,7 @@ import bo.htakey.rimic.audio.javacpp.Speex;
 import bo.htakey.rimic.exception.NativeAudioException;
 import bo.htakey.rimic.model.TalkState;
 import bo.htakey.rimic.model.User;
-import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.net.PacketBuffer;
 import bo.htakey.rimic.protocol.AudioHandler;
 
@@ -52,7 +52,7 @@ public class AudioOutputSpeech implements Callable<AudioOutputSpeech.Result> {
     private final Object mJitterLock = new Object();
 
     private User mUser;
-    private HumlaUDPMessageType mCodec;
+    private RimicUDPMessageType mCodec;
     private int mAudioBufferSize = AudioHandler.FRAME_SIZE;
     private int mRequestedSamples; // Number of samples requested
 
@@ -71,7 +71,7 @@ public class AudioOutputSpeech implements Callable<AudioOutputSpeech.Result> {
 
     private TalkStateListener mTalkStateListener;
 
-    public AudioOutputSpeech(User user, HumlaUDPMessageType codec, int requestedSamples, TalkStateListener listener) throws NativeAudioException {
+    public AudioOutputSpeech(User user, RimicUDPMessageType codec, int requestedSamples, TalkStateListener listener) throws NativeAudioException {
         // TODO: consider implementing resampling if some Android devices not support 48kHz?
         mUser = user;
         mCodec = codec;
@@ -116,7 +116,7 @@ public class AudioOutputSpeech implements Callable<AudioOutputSpeech.Result> {
         synchronized (mJitterLock) {
             try {
                 int samples = 0;
-                if (mCodec == HumlaUDPMessageType.UDPVoiceOpus) {
+                if (mCodec == RimicUDPMessageType.UDPVoiceOpus) {
                     long header = pb.readLong();
                     int size = (int) (header & ((1 << 13) - 1));
 
@@ -221,7 +221,7 @@ public class AudioOutputSpeech implements Callable<AudioOutputSpeech.Result> {
 
                         mHasTerminator = false;
                         try {
-                            if (mCodec == HumlaUDPMessageType.UDPVoiceOpus) {
+                            if (mCodec == RimicUDPMessageType.UDPVoiceOpus) {
                                 long header = pb.readLong();
                                 int size = (int) (header & ((1 << 13) - 1));
                                 mHasTerminator = (header & (1 << 13)) > 0;
@@ -344,7 +344,7 @@ public class AudioOutputSpeech implements Callable<AudioOutputSpeech.Result> {
         mRequestedSamples = samples;
     }
 
-    public HumlaUDPMessageType getCodec() {
+    public RimicUDPMessageType getCodec() {
         return mCodec;
     }
 

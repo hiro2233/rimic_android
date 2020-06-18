@@ -39,8 +39,8 @@ import bo.htakey.rimic.Constants;
  * Class to maintain and receive packets from the UDP connection to a Mumble server.
  * Public interface is not thread safe.
  */
-public class HumlaUDP implements Runnable {
-    private static final String TAG = "HumlaUDP";
+public class RimicUDP implements Runnable {
+    private static final String TAG = "RimicUDP";
 
     private static final int BUFFER_SIZE = 2048;
     private final CryptState mCryptState;
@@ -67,7 +67,7 @@ public class HumlaUDP implements Runnable {
      * @param listener Callback target. Messages will be posted on the callback handler given.
      * @param callbackHandler Handler to post listener invocations on.
      */
-    public HumlaUDP(@NotNull CryptState cryptState, @NotNull UDPConnectionListener listener,
+    public RimicUDP(@NotNull CryptState cryptState, @NotNull UDPConnectionListener listener,
                      @NotNull Handler callbackHandler) {
         mCryptState = cryptState;
         mListener = listener;

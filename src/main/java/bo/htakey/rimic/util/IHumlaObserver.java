@@ -26,12 +26,12 @@ import bo.htakey.rimic.model.IUser;
 /**
  * Created by andrew on 18/10/15.
  */
-public interface IHumlaObserver {
+public interface IRimicObserver {
     void onConnected();
 
     void onConnecting();
 
-    void onDisconnected(HumlaException e);
+    void onDisconnected(RimicException e);
 
     void onTLSHandshakeFailed(X509Certificate[] chain);
 

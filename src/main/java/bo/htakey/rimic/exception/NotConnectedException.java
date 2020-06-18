@@ -18,7 +18,7 @@
 package bo.htakey.rimic.exception;
 
 /**
- * Thrown when a Humla connection has not yet been established.
+ * Thrown when a Rimic connection has not yet been established.
  * Created by andrew on 24/10/15.
  */
 @SuppressWarnings("serial")

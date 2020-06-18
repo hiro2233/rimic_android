@@ -43570,8 +43570,8 @@ public final class Mumble {
       "\n\016message_length\030\004 \001(\r\022\034\n\024image_message_" +
       "length\030\005 \001(\r\022\021\n\tmax_users\030\006 \001(\r\"J\n\rSugge" +
       "stConfig\022\017\n\007version\030\001 \001(\r\022\022\n\npositional\030" +
-      "\002 \001(\010\022\024\n\014push_to_talk\030\003 \001(\010B&\n\030se.lublin" +
-      ".humla.protobufB\006MumbleH\001P\000"
+      "\002 \001(\010\022\024\n\014push_to_talk\030\003 \001(\010B&\n\030bo.htakey" +
+      ".rimic.protobufB\006MumbleH\001P\000"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -26,61 +26,61 @@ import bo.htakey.rimic.protobuf.Mumble;
  * Created by andrew on 14/07/13.
  */
 @SuppressWarnings("serial")
-public class HumlaException extends Exception implements Parcelable {
+public class RimicException extends Exception implements Parcelable {
 
-    public static final Creator<HumlaException> CREATOR = new Creator<HumlaException>() {
+    public static final Creator<RimicException> CREATOR = new Creator<RimicException>() {
         @Override
-        public HumlaException createFromParcel(Parcel source) {
-            return new HumlaException(source);
+        public RimicException createFromParcel(Parcel source) {
+            return new RimicException(source);
         }
 
         @Override
-        public HumlaException[] newArray(int size) {
-            return new HumlaException[size];
+        public RimicException[] newArray(int size) {
+            return new RimicException[size];
         }
     };
 
-    private HumlaDisconnectReason mReason;
+    private RimicDisconnectReason mReason;
     /** Indicates that this exception was caused by a reject from the server. */
     private Mumble.Reject mReject;
     /** Indicates that this exception was caused by being kicked/banned from the server. */
     private Mumble.UserRemove mUserRemove;
 
-    public HumlaException(String message, Throwable e, HumlaDisconnectReason reason) {
+    public RimicException(String message, Throwable e, RimicDisconnectReason reason) {
         super(message, e);
         mReason = reason;
     }
 
-    public HumlaException(String message, HumlaDisconnectReason reason) {
+    public RimicException(String message, RimicDisconnectReason reason) {
         super(message);
         mReason = reason;
     }
 
-    public HumlaException(Throwable e, HumlaDisconnectReason reason) {
+    public RimicException(Throwable e, RimicDisconnectReason reason) {
         super(e);
         mReason = reason;
     }
 
-    public HumlaException(Mumble.Reject reject) {
+    public RimicException(Mumble.Reject reject) {
         super("Rejected: " + reject.getReason());
         mReject = reject;
-        mReason = HumlaDisconnectReason.REJECT;
+        mReason = RimicDisconnectReason.REJECT;
     }
 
-    public HumlaException(Mumble.UserRemove userRemove) {
+    public RimicException(Mumble.UserRemove userRemove) {
         super((userRemove.getBan() ? "Banned: " : "Kicked: ")+userRemove.getReason());
         mUserRemove = userRemove;
-        mReason = HumlaDisconnectReason.USER_REMOVE;
+        mReason = RimicDisconnectReason.USER_REMOVE;
     }
 
-    private HumlaException(Parcel in) {
+    private RimicException(Parcel in) {
         super(in.readString(), (Throwable) in.readSerializable());
-        mReason = HumlaDisconnectReason.values()[in.readInt()];
+        mReason = RimicDisconnectReason.values()[in.readInt()];
         mReject = (Mumble.Reject) in.readSerializable();
         mUserRemove = (Mumble.UserRemove) in.readSerializable();
     }
 
-    public HumlaDisconnectReason getReason() {
+    public RimicDisconnectReason getReason() {
         return mReason;
     }
 
@@ -105,7 +105,7 @@ public class HumlaException extends Exception implements Parcelable {
         dest.writeSerializable(mUserRemove);
     }
 
-    public enum HumlaDisconnectReason {
+    public enum RimicDisconnectReason {
         REJECT,
         USER_REMOVE,
         CONNECTION_ERROR,

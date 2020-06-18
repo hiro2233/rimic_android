@@ -55,24 +55,24 @@ import bo.htakey.rimic.Constants;
 import bo.htakey.rimic.exception.NotConnectedException;
 import bo.htakey.rimic.exception.NotSynchronizedException;
 import bo.htakey.rimic.protobuf.Mumble;
-import bo.htakey.rimic.protocol.HumlaTCPMessageListener;
-import bo.htakey.rimic.protocol.HumlaUDPMessageListener;
-import bo.htakey.rimic.util.HumlaException;
+import bo.htakey.rimic.protocol.RimicTCPMessageListener;
+import bo.htakey.rimic.protocol.RimicUDPMessageListener;
+import bo.htakey.rimic.util.RimicException;
 
-public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP.UDPConnectionListener {
+public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP.UDPConnectionListener {
 
     /**
      * Message types that aren't shown in logcat.
      * For annoying types like UDPTunnel.
      */
-    public static final Set<HumlaTCPMessageType> UNLOGGED_MESSAGES;
+    public static final Set<RimicTCPMessageType> UNLOGGED_MESSAGES;
 
     static {
-        UNLOGGED_MESSAGES = new HashSet<HumlaTCPMessageType>();
-        UNLOGGED_MESSAGES.add(HumlaTCPMessageType.UDPTunnel);
-        UNLOGGED_MESSAGES.add(HumlaTCPMessageType.Ping);
+        UNLOGGED_MESSAGES = new HashSet<RimicTCPMessageType>();
+        UNLOGGED_MESSAGES.add(RimicTCPMessageType.UDPTunnel);
+        UNLOGGED_MESSAGES.add(RimicTCPMessageType.Ping);
     }
-    private HumlaConnectionListener mListener;
+    private RimicConnectionListener mListener;
 
     // Tor connection details
     public static final String TOR_HOST = "localhost";
@@ -90,15 +90,15 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
     private Handler mMainHandler;
 
     // Networking and protocols
-    private HumlaTCP mTCP;
-    private HumlaUDP mUDP;
+    private RimicTCP mTCP;
+    private RimicUDP mUDP;
     private ScheduledFuture<?> mPingTask;
     private boolean mUsingUDP = true;
     private boolean mForceTCP;
     private boolean mUseTor;
     private boolean mConnected;
     private boolean mSynchronized;
-    private HumlaException mError;
+    private RimicException mError;
     private boolean mExceptionHandled = false;
     private long mStartTimestamp; // Time that the connection was initiated in nanoseconds
     private final CryptState mCryptState = new CryptState();
@@ -115,19 +115,19 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
     private String mServerOSName;
     private String mServerOSVersion;
     private int mMaxBandwidth;
-    private HumlaUDPMessageType mCodec;
+    private RimicUDPMessageType mCodec;
 
     // Session
     private int mSession;
 
     // Message handlers
-    private ConcurrentLinkedQueue<HumlaTCPMessageListener> mTCPHandlers = new ConcurrentLinkedQueue<HumlaTCPMessageListener>();
-    private ConcurrentLinkedQueue<HumlaUDPMessageListener> mUDPHandlers = new ConcurrentLinkedQueue<HumlaUDPMessageListener>();
+    private ConcurrentLinkedQueue<RimicTCPMessageListener> mTCPHandlers = new ConcurrentLinkedQueue<RimicTCPMessageListener>();
+    private ConcurrentLinkedQueue<RimicUDPMessageListener> mUDPHandlers = new ConcurrentLinkedQueue<RimicUDPMessageListener>();
 
     /**
      * Handles packets received that are critical to the connection state.
      */
-    private HumlaTCPMessageListener mConnectionMessageHandler = new HumlaTCPMessageListener.Stub() {
+    private RimicTCPMessageListener mConnectionMessageHandler = new RimicTCPMessageListener.Stub() {
 
         @Override
         public void messageServerSync(Mumble.ServerSync msg) {
@@ -140,7 +140,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
             try {
                 mPingTask = mPingExecutorService.scheduleAtFixedRate(mPingRunnable, 0, 5, TimeUnit.SECONDS);
             } catch(RejectedExecutionException e) {
-                Log.w(Constants.TAG, "HumlaConnection fail to start ping thread, in \"shutdown\"? ", e);
+                Log.w(Constants.TAG, "RimicConnection fail to start ping thread, in \"shutdown\"? ", e);
             }
 
             mSession = msg.getSession();
@@ -159,24 +159,24 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
         @Override
         public void messageCodecVersion(Mumble.CodecVersion msg) {
             if(msg.hasOpus() && msg.getOpus())
-                mCodec = HumlaUDPMessageType.UDPVoiceOpus;
+                mCodec = RimicUDPMessageType.UDPVoiceOpus;
             else if(msg.hasBeta() && !msg.getPreferAlpha())
-                mCodec = HumlaUDPMessageType.UDPVoiceCELTBeta;
+                mCodec = RimicUDPMessageType.UDPVoiceCELTBeta;
             else
-                mCodec = HumlaUDPMessageType.UDPVoiceCELTAlpha;
+                mCodec = RimicUDPMessageType.UDPVoiceCELTAlpha;
         }
 
         @Override
         public void messageReject(final Mumble.Reject msg) {
             mConnected = false;
-            handleFatalException(new HumlaException(msg));
+            handleFatalException(new RimicException(msg));
         }
 
         @Override
         public void messageUserRemove(final Mumble.UserRemove msg) {
             if(msg.getSession() == mSession) {
                 mConnected = false;
-                handleFatalException(new HumlaException(msg));
+                handleFatalException(new RimicException(msg));
             }
         }
 
@@ -201,11 +201,11 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
                 } else {
                     Mumble.CryptSetup.Builder csb = Mumble.CryptSetup.newBuilder();
                     csb.setClientNonce(ByteString.copyFrom(mCryptState.mEncryptIV));
-                    sendTCPMessage(csb.build(), HumlaTCPMessageType.CryptSetup);
+                    sendTCPMessage(csb.build(), RimicTCPMessageType.CryptSetup);
                 }
             } catch (InvalidKeyException e) {
-                handleFatalException(new HumlaException("Received invalid cryptographic nonce from server", e,
-                        HumlaException.HumlaDisconnectReason.CONNECTION_ERROR));
+                handleFatalException(new RimicException("Received invalid cryptographic nonce from server", e,
+                        RimicException.RimicDisconnectReason.CONNECTION_ERROR));
             }
         }
 
@@ -246,7 +246,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
         }
     };
 
-    private HumlaUDPMessageListener mUDPPingListener = new HumlaUDPMessageListener.Stub() {
+    private RimicUDPMessageListener mUDPPingListener = new RimicUDPMessageListener.Stub() {
 
         @Override
         public void messageUDPPing(byte[] data) {
@@ -273,7 +273,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
 
             if (!shouldForceTCP()) {
                 ByteBuffer buffer = ByteBuffer.allocate(16);
-                buffer.put((byte) ((HumlaUDPMessageType.UDPPing.ordinal() << 5) & 0xFF));
+                buffer.put((byte) ((RimicUDPMessageType.UDPPing.ordinal() << 5) & 0xFF));
                 buffer.putLong(t);
 
                 sendUDPMessage(buffer.array(), 16, true);
@@ -287,7 +287,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
             pb.setLost(mCryptState.mUiLost);
             pb.setResync(mCryptState.mUiResync);
             // TODO accumulate stats and send with ping
-            sendTCPMessage(pb.build(), HumlaTCPMessageType.Ping);
+            sendTCPMessage(pb.build(), RimicTCPMessageType.Ping);
         }
     };
 
@@ -306,16 +306,16 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
     }
 
     /**
-     * Creates a new HumlaConnection object to facilitate server connections.
+     * Creates a new RimicConnection object to facilitate server connections.
      */
-    public HumlaConnection(HumlaConnectionListener listener) {
+    public RimicConnection(RimicConnectionListener listener) {
         mListener = listener;
         mMainHandler = new Handler(Looper.getMainLooper());
         mTCPHandlers.add(mConnectionMessageHandler);
         mUDPHandlers.add(mUDPPingListener);
     }
 
-    public void connect(String host, int port) throws HumlaException {
+    public void connect(String host, int port) throws RimicException {
         mHost = host;
         mPort = port;
         mConnected = false;
@@ -327,15 +327,15 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
 
         mPingExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-        HumlaSSLSocketFactory socketFactory = createSocketFactory();
+        RimicSSLSocketFactory socketFactory = createSocketFactory();
 
         try {
-            mTCP = new HumlaTCP(socketFactory);
+            mTCP = new RimicTCP(socketFactory);
             mTCP.setTCPConnectionListener(this);
             mTCP.connect(host, port, mUseTor);
             // UDP thread is formally started after TCP connection.
         } catch (ConnectException e) {
-            throw new HumlaException(e, HumlaException.HumlaDisconnectReason.CONNECTION_ERROR);
+            throw new RimicException(e, RimicException.RimicDisconnectReason.CONNECTION_ERROR);
         }
     }
 
@@ -356,18 +356,18 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
         return (System.nanoTime()-mStartTimestamp)/1000;
     }
 
-    public void addTCPMessageHandlers(HumlaTCPMessageListener... handlers) {
+    public void addTCPMessageHandlers(RimicTCPMessageListener... handlers) {
         Collections.addAll(mTCPHandlers, handlers);
     }
 
-    public void removeTCPMessageHandler(HumlaTCPMessageListener handler) {
+    public void removeTCPMessageHandler(RimicTCPMessageListener handler) {
         mTCPHandlers.remove(handler);
     }
-    public void addUDPMessageHandlers(HumlaUDPMessageListener... handlers) {
+    public void addUDPMessageHandlers(RimicUDPMessageListener... handlers) {
         Collections.addAll(mUDPHandlers, handlers);
     }
 
-    public void removeUDPMessageHandler(HumlaUDPMessageListener handler) {
+    public void removeUDPMessageHandler(RimicUDPMessageListener handler) {
         mUDPHandlers.remove(handler);
     }
 
@@ -457,7 +457,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
         return mMaxBandwidth;
     }
 
-    public HumlaUDPMessageType getCodec() throws NotSynchronizedException {
+    public RimicUDPMessageType getCodec() throws NotSynchronizedException {
         if (!isSynchronized())
             throw new NotSynchronizedException();
         return mCodec;
@@ -495,7 +495,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
      * Handles an exception that would cause termination of the connection.
      * @param e The exception that caused termination.
      */
-    private void handleFatalException(final HumlaException e) {
+    private void handleFatalException(final RimicException e) {
         if(mExceptionHandled) return;
         mExceptionHandled = true;
         mError = e;
@@ -507,11 +507,11 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
     }
 
     /**
-     * Attempts to create a socket factory using the HumlaConnection's certificate and trust
+     * Attempts to create a socket factory using the RimicConnection's certificate and trust
      * store configuration.
      * @return A socket factory set to authenticate with a certificate and trust store, if set.
      */
-    private HumlaSSLSocketFactory createSocketFactory() throws HumlaException {
+    private RimicSSLSocketFactory createSocketFactory() throws RimicException {
         try {
             KeyStore keyStore = null;
             if(mCertificate != null) {
@@ -521,23 +521,23 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
                         mCertificatePassword.toCharArray() : new char[0]);
             }
 
-            return new HumlaSSLSocketFactory(keyStore, mCertificatePassword, mTrustStorePath,
+            return new RimicSSLSocketFactory(keyStore, mCertificatePassword, mTrustStorePath,
                     mTrustStorePassword, mTrustStoreFormat);
         } catch (KeyManagementException e) {
-            throw new HumlaException("Could not recover keys from certificate", e,
-                    HumlaException.HumlaDisconnectReason.OTHER_ERROR);
+            throw new RimicException("Could not recover keys from certificate", e,
+                    RimicException.RimicDisconnectReason.OTHER_ERROR);
         } catch (KeyStoreException e) {
-            throw new HumlaException("Could not recover keys from certificate", e,
-                    HumlaException.HumlaDisconnectReason.OTHER_ERROR);
+            throw new RimicException("Could not recover keys from certificate", e,
+                    RimicException.RimicDisconnectReason.OTHER_ERROR);
         } catch (UnrecoverableKeyException e) {
-            throw new HumlaException("Could not recover keys from certificate", e,
-                    HumlaException.HumlaDisconnectReason.OTHER_ERROR);
+            throw new RimicException("Could not recover keys from certificate", e,
+                    RimicException.RimicDisconnectReason.OTHER_ERROR);
         } catch (IOException e) {
-            throw new HumlaException("Could not read certificate file", e,
-                    HumlaException.HumlaDisconnectReason.OTHER_ERROR);
+            throw new RimicException("Could not read certificate file", e,
+                    RimicException.RimicDisconnectReason.OTHER_ERROR);
         } catch (CertificateException e) {
-            throw new HumlaException("Could not read certificate", e,
-                    HumlaException.HumlaDisconnectReason.OTHER_ERROR);
+            throw new RimicException("Could not read certificate", e,
+                    RimicException.RimicDisconnectReason.OTHER_ERROR);
         } catch (NoSuchAlgorithmException e) {
                 /*
                  * This will actually NEVER occur.
@@ -560,7 +560,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
      * @param message A built protobuf message.
      * @param messageType The corresponding protobuf message type.
      */
-    public void sendTCPMessage(Message message, HumlaTCPMessageType messageType) {
+    public void sendTCPMessage(Message message, RimicTCPMessageType messageType) {
         if(!mConnected || mTCP == null) return;
         mTCP.sendMessage(message, messageType);
     }
@@ -579,7 +579,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
         }
         if (mServerVersion == 0x10202) applyLegacyCodecWorkaround(data);
         if (!force && (shouldForceTCP() || !mUsingUDP))
-            mTCP.sendMessage(data, length, HumlaTCPMessageType.UDPTunnel);
+            mTCP.sendMessage(data, length, RimicTCPMessageType.UDPTunnel);
         else if (!shouldForceTCP())
             mUDP.sendMessage(data, length);
     }
@@ -591,7 +591,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
         if(!mConnected) return;
         Mumble.UDPTunnel.Builder utb = Mumble.UDPTunnel.newBuilder();
         utb.setPacket(ByteString.copyFrom(new byte[3]));
-        sendTCPMessage(utb.build(), HumlaTCPMessageType.UDPTunnel);
+        sendTCPMessage(utb.build(), RimicTCPMessageType.UDPTunnel);
     }
 
     /**
@@ -602,22 +602,22 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
         if(!mConnected) return;
         Mumble.Authenticate.Builder ab = Mumble.Authenticate.newBuilder();
         ab.addAllTokens(tokens);
-        sendTCPMessage(ab.build(), HumlaTCPMessageType.Authenticate);
+        sendTCPMessage(ab.build(), RimicTCPMessageType.Authenticate);
     }
 
     @Override
-    public void onTCPMessageReceived(HumlaTCPMessageType type, int length, byte[] data) {
+    public void onTCPMessageReceived(RimicTCPMessageType type, int length, byte[] data) {
         if(!UNLOGGED_MESSAGES.contains(type))
             Log.v(Constants.TAG, "IN: "+type);
 
-        if(type == HumlaTCPMessageType.UDPTunnel) {
+        if(type == RimicTCPMessageType.UDPTunnel) {
             onUDPDataReceived(data);
             return;
         }
 
         try {
             Message message = getProtobufMessage(data, type);
-            for(HumlaTCPMessageListener handler : mTCPHandlers) {
+            for(RimicTCPMessageListener handler : mTCPHandlers) {
                 broadcastTCPMessage(handler, message, type);
             }
         } catch (InvalidProtocolBufferException e) {
@@ -631,7 +631,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
 
         // Attempt to start UDP thread once connected.
         if (!shouldForceTCP()) {
-            mUDP = new HumlaUDP(mCryptState, this, mMainHandler);
+            mUDP = new RimicUDP(mCryptState, this, mMainHandler);
             mUDP.connect(mHost, mPort);
         }
 
@@ -648,7 +648,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
     }
 
     @Override
-    public void onTCPConnectionFailed(HumlaException e) {
+    public void onTCPConnectionFailed(RimicException e) {
         handleFatalException(e);
     }
 
@@ -662,10 +662,10 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
     public void onUDPDataReceived(byte[] data) {
         if(mServerVersion == 0x10202) applyLegacyCodecWorkaround(data);
         int dataType = data[0] >> 5 & 0x7;
-        if(dataType < 0 || dataType > HumlaUDPMessageType.values().length - 1) return; // Discard invalid data types
-        HumlaUDPMessageType udpDataType = HumlaUDPMessageType.values()[dataType];
+        if(dataType < 0 || dataType > RimicUDPMessageType.values().length - 1) return; // Discard invalid data types
+        RimicUDPMessageType udpDataType = RimicUDPMessageType.values()[dataType];
 
-        for(HumlaUDPMessageListener handler : mUDPHandlers) {
+        for(RimicUDPMessageListener handler : mUDPHandlers) {
             broadcastUDPMessage(handler, data, udpDataType);
         }
     }
@@ -682,7 +682,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
     public void resyncCryptState() {
         // Send an empty cryptstate message to resync.
         Mumble.CryptSetup.Builder csb = Mumble.CryptSetup.newBuilder();
-        mTCP.sendMessage(csb.build(), HumlaTCPMessageType.CryptSetup);
+        mTCP.sendMessage(csb.build(), RimicTCPMessageType.CryptSetup);
     }
 
     /**
@@ -690,11 +690,11 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
      * @param data The UDP data to be patched, if we're on a 1.2.2 server.
      */
     private void applyLegacyCodecWorkaround(byte[] data) {
-        HumlaUDPMessageType dataType = HumlaUDPMessageType.values()[data[0] >> 5 & 0x7];
-        if(dataType == HumlaUDPMessageType.UDPVoiceCELTBeta)
-            dataType = HumlaUDPMessageType.UDPVoiceCELTAlpha;
-        else if(dataType == HumlaUDPMessageType.UDPVoiceCELTAlpha)
-            dataType = HumlaUDPMessageType.UDPVoiceCELTBeta;
+        RimicUDPMessageType dataType = RimicUDPMessageType.values()[data[0] >> 5 & 0x7];
+        if(dataType == RimicUDPMessageType.UDPVoiceCELTBeta)
+            dataType = RimicUDPMessageType.UDPVoiceCELTAlpha;
+        else if(dataType == RimicUDPMessageType.UDPVoiceCELTAlpha)
+            dataType = RimicUDPMessageType.UDPVoiceCELTBeta;
         data[0] = (byte) ((dataType.ordinal() << 5) & 0xFF);
     }
 
@@ -706,7 +706,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
      * @return The parsed protobuf message.
      * @throws InvalidProtocolBufferException Called if the messageType does not match the data.
      */
-    public static Message getProtobufMessage(byte[] data, HumlaTCPMessageType messageType) throws InvalidProtocolBufferException {
+    public static Message getProtobufMessage(byte[] data, RimicTCPMessageType messageType) throws InvalidProtocolBufferException {
         switch (messageType) {
             case Authenticate:
                 return Mumble.Authenticate.parseFrom(data);
@@ -770,7 +770,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
      * @param msg Protobuf message.
      * @param messageType The type of the message.
      */
-    public final void broadcastTCPMessage(HumlaTCPMessageListener handler, Message msg, HumlaTCPMessageType messageType) {
+    public final void broadcastTCPMessage(RimicTCPMessageListener handler, Message msg, RimicTCPMessageType messageType) {
         switch (messageType) {
             case Authenticate:
                 handler.messageAuthenticate((Mumble.Authenticate) msg);
@@ -863,7 +863,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
      * @param data Raw UDP data of the message.
      * @param messageType The type of the message.
      */
-    public final void broadcastUDPMessage(HumlaUDPMessageListener handler, byte[] data, HumlaUDPMessageType messageType) {
+    public final void broadcastUDPMessage(RimicUDPMessageListener handler, byte[] data, RimicUDPMessageType messageType) {
         switch (messageType) {
             case UDPPing:
                 handler.messageUDPPing(data);
@@ -881,11 +881,11 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
      * If the connection to the server was lost due to an error, return the exception.
      * @return An exception causing disconnect, or null if no error was recorded.
      */
-    public HumlaException getError() {
+    public RimicException getError() {
         return mError;
     }
 
-    public interface HumlaConnectionListener {
+    public interface RimicConnectionListener {
         /**
          * Called when the socket to the remote server has opened.
          */
@@ -899,7 +899,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
         /**
          * Called if the host's certificate failed verification.
          * Typically you would use this callback to prompt the user to authorize the certificate.
-         * Note that {@link #onConnectionDisconnected(HumlaException)} will still be called.
+         * Note that {@link #onConnectionDisconnected(RimicException)} will still be called.
          * @param chain The certificate chain which failed verification.
          */
         public void onConnectionHandshakeFailed(X509Certificate[] chain);
@@ -909,7 +909,7 @@ public class HumlaConnection implements HumlaTCP.TCPConnectionListener, HumlaUDP
          * the error will be provided.
          * @param e The exception that caused termination, or null if the disconnect was clean.
          */
-        public void onConnectionDisconnected(HumlaException e);
+        public void onConnectionDisconnected(RimicException e);
 
         /**
          * Called if the user should be notified of a connection-related warning.

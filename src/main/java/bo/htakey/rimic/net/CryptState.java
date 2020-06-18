@@ -32,7 +32,7 @@ import javax.crypto.spec.SecretKeySpec;
  * Based off of the official Mumble project's 'CryptState.h' and 'CryptState.cpp' files.
  *
  * This code implements the patented OCB-AES128 cipher mode of operation.
- * Until recently, this would've posed a problem- Humla is licensed under Apache v2, and the patent was only licensed for use with GPL software without authorization.
+ * Until recently, this would've posed a problem- Rimic is licensed under Apache v2, and the patent was only licensed for use with GPL software without authorization.
  * As of January 2013, the author has given a free license for any open source software certified by the OSI (Apache v2 included)
  * http://www.cs.ucdavis.edu/~rogaway/ocb/license.htm
  *

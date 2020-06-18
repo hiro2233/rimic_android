@@ -36,12 +36,12 @@ import bo.htakey.rimic.exception.AudioException;
 import bo.htakey.rimic.exception.AudioInitializationException;
 import bo.htakey.rimic.exception.NativeAudioException;
 import bo.htakey.rimic.model.User;
-import bo.htakey.rimic.net.HumlaConnection;
-import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.RimicConnection;
+import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.net.PacketBuffer;
 import bo.htakey.rimic.protobuf.Mumble;
-import bo.htakey.rimic.util.HumlaLogger;
-import bo.htakey.rimic.util.HumlaNetworkListener;
+import bo.htakey.rimic.util.RimicLogger;
+import bo.htakey.rimic.util.RimicNetworkListener;
 
 /**
  * Bridges the protocol's audio messages to our input and output threads.
@@ -52,13 +52,13 @@ import bo.htakey.rimic.util.HumlaNetworkListener;
  * Calling shutdown() will cleanup both input and output threads. It is safe to restart after.
  * Created by andrew on 23/04/14.
  */
-public class AudioHandler extends HumlaNetworkListener implements AudioInput.AudioInputListener {
+public class AudioHandler extends RimicNetworkListener implements AudioInput.AudioInputListener {
     public static final int SAMPLE_RATE = 48000;
     public static final int FRAME_SIZE = SAMPLE_RATE/100;
     public static final int MAX_BUFFER_SIZE = 960;
 
     private final Context mContext;
-    private final HumlaLogger mLogger;
+    private final RimicLogger mLogger;
     private final AudioManager mAudioManager;
     private final AudioInput mInput;
     private final AudioOutput mOutput;
@@ -66,7 +66,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
     private AudioEncodeListener mEncodeListener;
 
     private int mSession;
-    private HumlaUDPMessageType mCodec;
+    private RimicUDPMessageType mCodec;
     private IEncoder mEncoder;
     private int mFrameCounter;
 
@@ -90,7 +90,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
     private final Object mEncoderLock;
     private byte mTargetId;
 
-    public AudioHandler(Context context, HumlaLogger logger, int audioStream, int audioSource,
+    public AudioHandler(Context context, RimicLogger logger, int audioStream, int audioSource,
                         int sampleRate, int targetBitrate, int targetFramesPerPacket,
                         IInputMode inputMode, byte targetId, float amplitudeBoost,
                         boolean bluetoothEnabled, boolean halfDuplexEnabled,
@@ -124,7 +124,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
      * Starts the audio output and input threads.
      * Will create both the input and output modules if they haven't been created yet.
      */
-    public synchronized void initialize(User self, int maxBandwidth, HumlaUDPMessageType codec) throws AudioException {
+    public synchronized void initialize(User self, int maxBandwidth, RimicUDPMessageType codec) throws AudioException {
         if(mInitialized) return;
         mSession = self.getSession();
 
@@ -190,7 +190,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
         }
     }
 
-    public HumlaUDPMessageType getCodec() {
+    public RimicUDPMessageType getCodec() {
         return mCodec;
     }
 
@@ -198,7 +198,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
         setCodec(mCodec);
     }
 
-    public void setCodec(HumlaUDPMessageType codec) throws NativeAudioException {
+    public void setCodec(RimicUDPMessageType codec) throws NativeAudioException {
         mCodec = codec;
 
         if (mEncoder != null) {
@@ -268,7 +268,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
         int bitrate = mBitrate;
         int framesPerPacket = mFramesPerPacket;
         // Logic as per desktop Mumble's AudioInput::adjustBandwidth for consistency.
-        if (HumlaConnection.calculateAudioBandwidth(bitrate, framesPerPacket) > maxBandwidth) {
+        if (RimicConnection.calculateAudioBandwidth(bitrate, framesPerPacket) > maxBandwidth) {
             if (framesPerPacket <= 4 && maxBandwidth <= 32000) {
                 framesPerPacket = 4;
             } else if (framesPerPacket == 1 && maxBandwidth <= 64000) {
@@ -276,7 +276,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
             } else if (framesPerPacket == 2 && maxBandwidth <= 48000) {
                 framesPerPacket = 4;
             }
-            while (HumlaConnection.calculateAudioBandwidth(bitrate, framesPerPacket)
+            while (RimicConnection.calculateAudioBandwidth(bitrate, framesPerPacket)
                     > maxBandwidth && bitrate > 8000) {
                 bitrate -= 1000;
             }
@@ -311,7 +311,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
     }
 
     public int getCurrentBandwidth() {
-        return HumlaConnection.calculateAudioBandwidth(mBitrate, mFramesPerPacket);
+        return RimicConnection.calculateAudioBandwidth(mBitrate, mFramesPerPacket);
     }
 
     /**
@@ -342,13 +342,13 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
         if (!mInitialized)
             return; // Only listen to change events in this handler.
 
-        HumlaUDPMessageType codec;
+        RimicUDPMessageType codec;
         if (msg.hasOpus() && msg.getOpus()) {
-            codec = HumlaUDPMessageType.UDPVoiceOpus;
+            codec = RimicUDPMessageType.UDPVoiceOpus;
         } else if (msg.hasBeta() && !msg.getPreferAlpha()) {
-            codec = HumlaUDPMessageType.UDPVoiceCELTBeta;
+            codec = RimicUDPMessageType.UDPVoiceCELTBeta;
         } else {
-            codec = HumlaUDPMessageType.UDPVoiceCELTAlpha;
+            codec = RimicUDPMessageType.UDPVoiceCELTAlpha;
         }
 
         if (codec != mCodec) {
@@ -388,7 +388,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
     }
 
     @Override
-    public void messageVoiceData(byte[] data, HumlaUDPMessageType messageType) {
+    public void messageVoiceData(byte[] data, RimicUDPMessageType messageType) {
         synchronized (mOutput) {
             mOutput.queueVoiceData(data, messageType);
         }
@@ -501,7 +501,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
      */
     public static class Builder {
         private Context mContext;
-        private HumlaLogger mLogger;
+        private RimicLogger mLogger;
         private int mAudioStream;
         private int mAudioSource;
         private int mTargetBitrate;
@@ -520,7 +520,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
             return this;
         }
 
-        public Builder setLogger(HumlaLogger logger) {
+        public Builder setLogger(RimicLogger logger) {
             mLogger = logger;
             return this;
         }
@@ -589,7 +589,7 @@ public class AudioHandler extends HumlaNetworkListener implements AudioInput.Aud
          * Creates a new AudioHandler for the given session and begins managing input/output.
          * @return An initialized audio handler.
          */
-        public AudioHandler initialize(User self, int maxBandwidth, HumlaUDPMessageType codec, byte targetId) throws AudioException {
+        public AudioHandler initialize(User self, int maxBandwidth, RimicUDPMessageType codec, byte targetId) throws AudioException {
             AudioHandler handler = new AudioHandler(mContext, mLogger, mAudioStream, mAudioSource,
                     mInputSampleRate, mTargetBitrate, mTargetFramesPerPacket, mInputMode, targetId,
                     mAmplitudeBoost, mBluetoothEnabled, mHalfDuplexEnabled,

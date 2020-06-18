@@ -41,7 +41,7 @@ import bo.htakey.rimic.exception.AudioInitializationException;
 import bo.htakey.rimic.exception.NativeAudioException;
 import bo.htakey.rimic.model.TalkState;
 import bo.htakey.rimic.model.User;
-import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.net.PacketBuffer;
 import bo.htakey.rimic.protocol.AudioHandler;
 
@@ -202,7 +202,7 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
         return true;
     }
 
-    public void queueVoiceData(byte[] data, HumlaUDPMessageType messageType) {
+    public void queueVoiceData(byte[] data, RimicUDPMessageType messageType) {
         if(!mRunning)
             return;
 

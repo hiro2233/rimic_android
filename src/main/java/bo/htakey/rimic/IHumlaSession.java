@@ -6,7 +6,7 @@ import bo.htakey.rimic.model.IChannel;
 import bo.htakey.rimic.model.IUser;
 import bo.htakey.rimic.model.Message;
 import bo.htakey.rimic.model.WhisperTarget;
-import bo.htakey.rimic.net.HumlaUDPMessageType;
+import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.util.VoiceTargetMode;
 
 /**
@@ -14,7 +14,7 @@ import bo.htakey.rimic.util.VoiceTargetMode;
  * Created by andrew on 28/02/17.
  */
 
-public interface IHumlaSession {
+public interface IRimicSession {
     /**
      * @return the latency in milliseconds for the TCP connection.
      */
@@ -101,7 +101,7 @@ public interface IHumlaSession {
 
     int getTransmitMode();
 
-    HumlaUDPMessageType getCodec();
+    RimicUDPMessageType getCodec();
 
     boolean usingBluetoothSco();
 

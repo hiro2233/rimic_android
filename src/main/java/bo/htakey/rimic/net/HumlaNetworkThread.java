@@ -32,7 +32,7 @@ import bo.htakey.rimic.Constants;
  * Created by andrew on 25/03/14.
  * @deprecated This shouldn't be needed. Redundant inheritance with limited shared code.
  */
-public abstract class HumlaNetworkThread implements Runnable {
+public abstract class RimicNetworkThread implements Runnable {
 
     private ExecutorService mExecutor;
     private ExecutorService mSendExecutor;
@@ -40,7 +40,7 @@ public abstract class HumlaNetworkThread implements Runnable {
     private Handler mMainHandler;
     private boolean mInitialized;
 
-    public HumlaNetworkThread() {
+    public RimicNetworkThread() {
         mMainHandler = new Handler(Looper.getMainLooper());
     }
 

@@ -17,7 +17,7 @@
 
 package bo.htakey.rimic.net;
 
-public enum HumlaUDPMessageType {
+public enum RimicUDPMessageType {
     UDPVoiceCELTAlpha,
     UDPPing,
     UDPVoiceSpeex,

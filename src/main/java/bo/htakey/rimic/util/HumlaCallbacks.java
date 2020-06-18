@@ -27,153 +27,153 @@ import bo.htakey.rimic.model.IMessage;
 import bo.htakey.rimic.model.IUser;
 
 /**
- * A composite wrapper around Humla observers to easily broadcast to each observer.
+ * A composite wrapper around Rimic observers to easily broadcast to each observer.
  * Created by andrew on 12/07/14.
  */
-public class HumlaCallbacks implements IHumlaObserver {
-    private final Set<IHumlaObserver> mCallbacks;
+public class RimicCallbacks implements IRimicObserver {
+    private final Set<IRimicObserver> mCallbacks;
 
-    public HumlaCallbacks() {
-        mCallbacks = Collections.newSetFromMap(new ConcurrentHashMap<IHumlaObserver, Boolean>());
+    public RimicCallbacks() {
+        mCallbacks = Collections.newSetFromMap(new ConcurrentHashMap<IRimicObserver, Boolean>());
     }
 
-    public void registerObserver(IHumlaObserver observer) {
+    public void registerObserver(IRimicObserver observer) {
         mCallbacks.add(observer);
     }
 
-    public void unregisterObserver(IHumlaObserver observer) {
+    public void unregisterObserver(IRimicObserver observer) {
         mCallbacks.remove(observer);
     }
 
     @Override
     public void onConnected() {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onConnected();
         }
     }
 
     @Override
     public void onConnecting() {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onConnecting();
         }
     }
 
     @Override
-    public void onDisconnected(HumlaException e) {
-        for (IHumlaObserver observer : mCallbacks) {
+    public void onDisconnected(RimicException e) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onDisconnected(e);
         }
     }
 
     @Override
     public void onTLSHandshakeFailed(X509Certificate[] chain) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onTLSHandshakeFailed(chain);
         }
     }
 
     @Override
     public void onChannelAdded(IChannel channel) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onChannelAdded(channel);
         }
     }
 
     @Override
     public void onChannelStateUpdated(IChannel channel) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onChannelStateUpdated(channel);
         }
     }
 
     @Override
     public void onChannelRemoved(IChannel channel) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onChannelRemoved(channel);
         }
     }
 
     @Override
     public void onChannelPermissionsUpdated(IChannel channel) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onChannelPermissionsUpdated(channel);
         }
     }
 
     @Override
     public void onUserConnected(IUser user) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onUserConnected(user);
         }
     }
 
     @Override
     public void onUserStateUpdated(IUser user) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onUserStateUpdated(user);
         }
     }
 
     @Override
     public void onUserTalkStateUpdated(IUser user) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onUserTalkStateUpdated(user);
         }
     }
 
     @Override
     public void onUserJoinedChannel(IUser user, IChannel newChannel, IChannel oldChannel) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onUserJoinedChannel(user, newChannel, oldChannel);
         }
     }
 
     @Override
     public void onUserRemoved(IUser user, String reason) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onUserRemoved(user, reason);
         }
     }
 
     @Override
     public void onPermissionDenied(String reason) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onPermissionDenied(reason);
         }
     }
 
     @Override
     public void onMessageLogged(IMessage message) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onMessageLogged(message);
         }
     }
 
     @Override
     public void onVoiceTargetChanged(VoiceTargetMode mode) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onVoiceTargetChanged(mode);
         }
     }
 
     @Override
     public void onLogInfo(String message) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onLogInfo(message);
         }
     }
 
     @Override
     public void onLogWarning(String message) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onLogWarning(message);
         }
     }
 
     @Override
     public void onLogError(String message) {
-        for (IHumlaObserver observer : mCallbacks) {
+        for (IRimicObserver observer : mCallbacks) {
             observer.onLogError(message);
         }
     }

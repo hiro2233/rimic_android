@@ -24,10 +24,10 @@ import bo.htakey.rimic.model.IMessage;
 import bo.htakey.rimic.model.IUser;
 
 /**
- * Stub class for Humla service observation.
+ * Stub class for Rimic service observation.
  * Created by andrew on 31/07/13.
  */
-public class HumlaObserver implements IHumlaObserver {
+public class RimicObserver implements IRimicObserver {
     @Override
     public void onConnected() {
 
@@ -39,7 +39,7 @@ public class HumlaObserver implements IHumlaObserver {
     }
 
     @Override
-    public void onDisconnected(HumlaException e) {
+    public void onDisconnected(RimicException e) {
 
     }
 
