@@ -18,6 +18,15 @@ ROOT := $(call my-dir)
 
 include $(CLEAR_VARS)
 
+ifeq ($(TARGET_ARCH), arm)
+LOCAL_ARM_MODE := arm
+endif
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_ARM_NEON := true
+endif
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+LOCAL_ARM_NEON := true
+endif
 LOCAL_PATH          := $(ROOT)/speex/libspeex
 LOCAL_MODULE        := jnispeex
 LOCAL_C_INCLUDES    := $(ROOT)/speex/include/
@@ -38,6 +47,15 @@ LOCAL_LDLIBS := -llog -latomic
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+ifeq ($(TARGET_ARCH), arm)
+LOCAL_ARM_MODE := arm
+endif
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_ARM_NEON := true
+endif
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+LOCAL_ARM_NEON := true
+endif
 LOCAL_PATH          := $(ROOT)/celt-0.11.0-src/libcelt
 LOCAL_MODULE        := jnicelt11
 LOCAL_SRC_FILES     := bands.c celt.c cwrs.c entcode.c entdec.c entenc.c header.c kiss_fft.c \
@@ -50,6 +68,15 @@ LOCAL_LDLIBS := -llog -latomic
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+ifeq ($(TARGET_ARCH), arm)
+LOCAL_ARM_MODE := arm
+endif
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_ARM_NEON := true
+endif
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+LOCAL_ARM_NEON := true
+endif
 LOCAL_PATH          := $(ROOT)/celt-0.7.0-src/libcelt
 LOCAL_MODULE        := jnicelt7
 LOCAL_SRC_FILES     := bands.c celt.c cwrs.c entcode.c entdec.c entenc.c header.c kiss_fft.c \
@@ -62,6 +89,15 @@ LOCAL_LDLIBS := -llog -latomic
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
+ifeq ($(TARGET_ARCH), arm)
+LOCAL_ARM_MODE := arm
+endif
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_ARM_NEON := true
+endif
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+LOCAL_ARM_NEON := true
+endif
 LOCAL_PATH   := $(ROOT)/opus
 LOCAL_MODULE := jniopus
 
