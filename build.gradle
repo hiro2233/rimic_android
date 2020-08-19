@@ -37,7 +37,6 @@ dependencies {
     api 'com.madgag.spongycastle:prov:1.51.0.0'
     api 'com.madgag.spongycastle:pkix:1.51.0.0'
 
-
     // Custom PKCS12 keybag parse modifications to support Mumble unencrypted certificates
     // Source: https://github.com/Morlunk/spongycastle/tree/pkcs12-keybag-fixes
     //api files('libs/humla-spongycastle/prov/build/libs/prov-1.51.0.0.jar',
@@ -74,6 +73,16 @@ android {
 //            stl "gnustl_static"
 //            cFlags "-I\$(LOCAL_PATH)/speex/include/ -I\$(LOCAL_PATH)/celt-0.11.0-src/include/ -I\$(LOCAL_PATH)/celt-0.7.0-src/include/ -I\$(LOCAL_PATH)/opus/include -D__EMX__ -DUSE_KISS_FFT -DFIXED_POINT -DEXPORT='' -DHAVE_CONFIG_H -fvisibility=hidden -DOPUS_BUILD -DVAR_ARRAYS -Wno-traditional -DFIXED_POINT"
 //        }
+    }
+
+    splits {
+        abi {
+            // Enables building multiple APKs per ABI.
+            enable false
+            reset()
+            include "armeabi", "armeabi-v7a", "arm64-v8a"
+            universalApk false
+        }
     }
 
     // Trigger NDK build on java compilation task.
