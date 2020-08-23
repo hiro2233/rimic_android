@@ -44,6 +44,7 @@ import bo.htakey.rimic.model.User;
 import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.net.PacketBuffer;
 import bo.htakey.rimic.protocol.AudioHandler;
+import bo.htakey.rimic.audio.encoder.PreprocessingEncoder;
 
 /**
  * Created by andrew on 16/07/13.
@@ -75,7 +76,7 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
 
         int minBufferSize = AudioTrack.getMinBufferSize(AudioHandler.SAMPLE_RATE,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        mBufferSize = Math.min(minBufferSize, AudioHandler.FRAME_SIZE * 12);
+        mBufferSize = Math.min(minBufferSize, AudioHandler.FRAME_SIZE * 4);
         Log.v(Constants.TAG, "Using buffer size " + mBufferSize + ", system's min buffer size: " + minBufferSize);
 
         try {
@@ -136,21 +137,16 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
         while(mRunning) {
             if(fetchAudio(mix, 0, mBufferSize)) {
                 mAudioTrack.write(mix, 0, mBufferSize);
+                PreprocessingEncoder.mEcho.echo_playback(mix);
             } else {
-                Log.v(Constants.TAG, "Pausing audio output thread.");
                 synchronized (mInactiveLock) {
                     mAudioTrack.flush();
-                    mAudioTrack.pause();
-
                     try {
                         mInactiveLock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-
-                    mAudioTrack.play();
                 }
-                Log.v(Constants.TAG, "Resuming audio output thread.");
             }
         }
 
@@ -170,7 +166,6 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
         Arrays.fill(buffer, bufferOffset, bufferOffset + bufferSize, (short) 0);
         final List<IAudioMixerSource<float[]>> sources = new ArrayList<>();
         try {
-            mPacketLock.lock();
             // Parallelize decoding using a fixed thread pool equal to the number of cores
             List<Future<AudioOutputSpeech.Result>> futureResults =
                     mDecodeExecutorService.invokeAll(mAudioOutputs.values());
@@ -186,13 +181,14 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
                 }
             }
         } catch (InterruptedException e) {
+            Log.v(Constants.TAG, "InterruptedException on FetchAudio " + e.getMessage());
             e.printStackTrace();
             return false;
         } catch (ExecutionException e) {
+            Log.v(Constants.TAG, "ExecutionException on FetchAudio " + e.getMessage());
             e.printStackTrace();
             return false;
         } finally {
-            mPacketLock.unlock();
         }
 
         if (sources.size() == 0)
@@ -216,33 +212,33 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
             int seq = (int) pds.readLong();
 
             // Synchronize so we don't destroy an output while we add a buffer to it.
-            mPacketLock.lock();
-            AudioOutputSpeech aop = mAudioOutputs.get(session);
-            if(aop != null && aop.getCodec() != messageType) {
-                aop.destroy();
-                aop = null;
-            }
-            if(aop == null) {
-                try {
-                    aop = new AudioOutputSpeech(user, messageType, mBufferSize, this);
-                } catch (NativeAudioException e) {
-                    Log.v(Constants.TAG, "Failed to create audio user "+user.getName());
-                    e.printStackTrace();
-                    return;
+            try {
+                AudioOutputSpeech aop = mAudioOutputs.get(session);
+                if(aop != null && aop.getCodec() != messageType) {
+                    aop.destroy();
+                    aop = null;
                 }
-                Log.v(Constants.TAG, "Created audio user "+user.getName());
-                mAudioOutputs.put(session, aop);
+
+                if(aop == null) {
+                    try {
+                        aop = new AudioOutputSpeech(user, messageType, mBufferSize, this);
+                    } catch (NativeAudioException e) {
+                        Log.v(Constants.TAG, "Failed to create audio user "+user.getName());
+                        e.printStackTrace();
+                        return;
+                    }
+                    Log.v(Constants.TAG, "Created audio user "+user.getName());
+                    mAudioOutputs.put(session, aop);
+                }
+
+                PacketBuffer dataBuffer = new PacketBuffer(pds.bufferBlock(pds.left()));
+                aop.addFrameToBuffer(dataBuffer, msgFlags, seq);
+            } finally {
             }
-            mPacketLock.unlock();
-
-            PacketBuffer dataBuffer = new PacketBuffer(pds.bufferBlock(pds.left()));
-            aop.addFrameToBuffer(dataBuffer, msgFlags, seq);
-
             synchronized (mInactiveLock) {
                 mInactiveLock.notify();
             }
         }
-
     }
 
     @Override

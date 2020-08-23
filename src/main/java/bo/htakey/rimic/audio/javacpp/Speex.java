@@ -34,8 +34,11 @@ import bo.htakey.rimic.exception.NativeAudioException;
 /**
  * JavaCPP interface for Speex JNI.
  * Created by andrew on 18/10/13.
+ *
+ * Added Speex Echo Canceller interface.
+ * Created by hiroshi on 23/08/2020
  */
-@Platform(library= "jnispeex", cinclude={"<speex/speex.h>","<speex/speex_types.h>", "<speex/speex_bits.h>","<speex/speex_jitter.h>", "<speex/speex_preprocess.h>", "<speex/speex_resampler.h>"})
+@Platform(library= "jnispeex", cinclude={"<speex/speex.h>","<speex/speex_echo.h>","<speex/speex_types.h>", "<speex/speex_bits.h>","<speex/speex_jitter.h>", "<speex/speex_preprocess.h>", "<speex/speex_resampler.h>"})
 public class Speex {
 
     /**
@@ -249,6 +252,15 @@ public class Speex {
     private static native void speex_preprocess_estimate_update(@Cast("SpeexPreprocessState*") Pointer state, short[] x);
     private static native int speex_preprocess_ctl(@Cast("SpeexPreprocessState*") Pointer state, int request, Pointer ptr);
 
+    // Echo Canceller
+    private static native Pointer speex_echo_state_init(int frame_size, int filter_length);
+    private static native void speex_echo_state_destroy(@Cast("SpeexEchoState*") Pointer state);
+    private static native void speex_echo_state_reset(@Cast("SpeexEchoState*") Pointer state);
+    private static native void speex_echo_cancellation(@Cast("SpeexEchoState*") Pointer state, short rec[], short play[], short out[]);
+    private static native void speex_echo_capture(@Cast("SpeexEchoState*") Pointer state, short rec[], short out[]);
+    private static native void speex_echo_playback(@Cast("SpeexEchoState*") Pointer state, short play[]);
+    private static native int speex_echo_ctl(@Cast("SpeexEchoState*") Pointer state, int request, Pointer ptr);
+
     // Bits
     private static native void speex_bits_init(@Cast("SpeexBits*") SpeexBits bits);
     private static native void speex_bits_read_from(@Cast("SpeexBits*") SpeexBits bits, @Cast("const char*") ByteBuffer data, int size);
@@ -425,6 +437,44 @@ public class Speex {
 
         public void destroy() {
             speex_preprocess_state_destroy(mNativeState);
+        }
+
+    }
+
+    public static class SpeexEchoState {
+        /** Set sampling rate */
+        public static final int SPEEX_ECHO_SET_SAMPLING_RATE = 24;
+        /** Get sampling rate */
+        public static final int SPEEX_ECHO_GET_SAMPLING_RATE = 25;
+
+        private Pointer mNativeState;
+
+        public SpeexEchoState(int frameSize, int filter_length) {
+            mNativeState = speex_echo_state_init(frameSize, filter_length);
+        }
+
+        public void echo_cancellation(short rec[], short play[], short out[]) {
+            speex_echo_cancellation(mNativeState, rec, play, out);
+        }
+
+        public void echo_capture(short rec[], short out[]) {
+            speex_echo_capture(mNativeState, rec, out);
+        }
+
+        public void echo_playback(short play[]) {
+            speex_echo_playback(mNativeState, play);
+        }
+
+        public int control(int request, Pointer pointer) {
+            return speex_echo_ctl(mNativeState, request, pointer);
+        }
+
+        public void reset_echo() {
+            speex_echo_state_reset(mNativeState);
+        }
+
+        public void destroy() {
+            speex_echo_state_destroy(mNativeState);
         }
 
     }
