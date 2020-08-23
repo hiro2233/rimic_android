@@ -51,11 +51,16 @@ import bo.htakey.rimic.util.RimicNetworkListener;
  * them in most cases (they're immutable for the purpose of avoiding threading issues).
  * Calling shutdown() will cleanup both input and output threads. It is safe to restart after.
  * Created by andrew on 23/04/14.
+ *
+ * Removed setMaxBandwidth() this was unnecessary, codec already perform this automatically through
+ * bitrate and sample rate.
+ * Fixed sample rate and buffers, now we can set to 10 ms regardless sampling rate ;)
+ * Updated by hiroshi on 21/08/2020
  */
 public class AudioHandler extends RimicNetworkListener implements AudioInput.AudioInputListener {
-    public static final int SAMPLE_RATE = 48000;
+    public static final int SAMPLE_RATE = 16000;
     public static final int FRAME_SIZE = SAMPLE_RATE/100;
-    public static final int MAX_BUFFER_SIZE = 960;
+    public static final int MAX_BUFFER_SIZE = FRAME_SIZE * 4;
 
     private final Context mContext;
     private final RimicLogger mLogger;
@@ -128,13 +133,17 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         if(mInitialized) return;
         mSession = self.getSession();
 
-        setMaxBandwidth(maxBandwidth);
         setCodec(codec);
         setServerMuted(self.isMuted() || self.isLocalMuted() || self.isSuppressed());
         startRecording();
-        // Ensure that if a bluetooth SCO connection is active, we use the VOICE_CALL stream.
-        // This is required by Android for compatibility with SCO.
-        mOutput.startPlaying(mBluetoothOn ? AudioManager.STREAM_VOICE_CALL : mAudioStream);
+
+        mOutput.startPlaying(AudioManager.STREAM_VOICE_CALL);
+
+        if (mAudioStream == AudioManager.STREAM_MUSIC) {
+            mAudioManager.setSpeakerphoneOn(true);
+        } else {
+            mAudioManager.setSpeakerphoneOn(false);
+        }
 
         mInitialized = true;
     }
@@ -261,6 +270,7 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
      * Adjusts the bitrate and frames per packet accordingly to meet the server's requirement.
      * @param maxBandwidth The server-reported maximum bandwidth, in bps.
      */
+/*
     private void setMaxBandwidth(int maxBandwidth) throws AudioException {
         if (maxBandwidth == -1) {
             return;
@@ -292,7 +302,7 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
                     maxBandwidth/1000, maxBandwidth/1000, framesPerPacket * 10));
         }
     }
-
+*/
     public int getFramesPerPacket() {
         return mFramesPerPacket;
     }
@@ -336,7 +346,6 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         mEncodeListener.onTalkingStateChanged(false);
     }
 
-
     @Override
     public void messageCodecVersion(Mumble.CodecVersion msg) {
         if (!mInitialized)
@@ -364,11 +373,6 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
 
     @Override
     public void messageServerSync(Mumble.ServerSync msg) {
-        try {
-            setMaxBandwidth(msg.hasMaxBandwidth() ? msg.getMaxBandwidth() : -1);
-        } catch (AudioException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
