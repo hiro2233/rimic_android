@@ -68,8 +68,10 @@ public class AudioInput implements Runnable {
     }
 
     private static AudioRecord setupAudioRecord(int sampleRate, int audioSource) throws AudioInitializationException {
-        int minBufferSize = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO,
+        int minBufferSizetmp = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO,
                                                                 AudioFormat.ENCODING_PCM_16BIT);
+        int minBufferSize;
+        minBufferSize = Math.min(minBufferSizetmp, (sampleRate * AudioHandler.FRAME_SIZE) / AudioHandler.SAMPLE_RATE);
         if (minBufferSize <= 0)
             throw new AudioInitializationException("Invalid buffer size returned (unsupported sample rate).");
 
