@@ -75,12 +75,33 @@ public class AudioInput implements Runnable {
         if (minBufferSize <= 0)
             throw new AudioInitializationException("Invalid buffer size returned (unsupported sample rate).");
 
-        AudioRecord audioRecord;
+        AudioRecord audioRecord = null;
+        boolean fail_input = false;
         try {
             audioRecord = new AudioRecord(audioSource, sampleRate, AudioFormat.CHANNEL_IN_MONO,
                                                  AudioFormat.ENCODING_PCM_16BIT, minBufferSize);
         } catch (IllegalArgumentException e) {
-            throw new AudioInitializationException(e);
+            fail_input = true;
+            minBufferSize = Math.min(minBufferSizetmp, 1024);
+        }
+
+        if (fail_input == true) {
+            try {
+                audioRecord = new AudioRecord(audioSource, sampleRate, AudioFormat.CHANNEL_IN_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, minBufferSize);
+                fail_input = false;
+            } catch (IllegalArgumentException e) {
+                fail_input = true;
+            }
+        }
+
+        if (fail_input == false) {
+            try {
+                audioRecord = new AudioRecord(audioSource, sampleRate, AudioFormat.CHANNEL_IN_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT, minBufferSizetmp);
+            } catch (IllegalArgumentException e) {
+                throw new AudioInitializationException(e);
+            }
         }
 
         if(audioRecord.getState() == AudioRecord.STATE_UNINITIALIZED) {
