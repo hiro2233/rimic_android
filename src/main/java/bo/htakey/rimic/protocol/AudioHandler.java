@@ -19,6 +19,7 @@ package bo.htakey.rimic.protocol;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.os.Build;
 import android.util.Log;
 
 import bo.htakey.rimic.Constants;
@@ -60,7 +61,7 @@ import bo.htakey.rimic.util.RimicNetworkListener;
 public class AudioHandler extends RimicNetworkListener implements AudioInput.AudioInputListener {
     public static final int SAMPLE_RATE = 16000;
     public static final int FRAME_SIZE = SAMPLE_RATE/100;
-    public static final int MAX_BUFFER_SIZE = FRAME_SIZE * 4;
+    public static final int MAX_BUFFER_SIZE = FRAME_SIZE * 12;
 
     private final Context mContext;
     private final RimicLogger mLogger;
@@ -138,7 +139,6 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         startRecording();
 
         mOutput.startPlaying(AudioManager.STREAM_VOICE_CALL);
-
         if (mAudioStream == AudioManager.STREAM_MUSIC) {
             mAudioManager.setSpeakerphoneOn(true);
         } else {
@@ -268,7 +268,6 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
     /**
      * Sets the maximum bandwidth available for audio input as obtained from the server.
      * Adjusts the bitrate and frames per packet accordingly to meet the server's requirement.
-     * @param maxBandwidth The server-reported maximum bandwidth, in bps.
      */
 /*
     private void setMaxBandwidth(int maxBandwidth) throws AudioException {
