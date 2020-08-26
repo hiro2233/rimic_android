@@ -17,11 +17,15 @@
 
 package bo.htakey.rimic.audio;
 
+import android.media.AudioAttributes;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Process;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -76,16 +80,37 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
 
         int minBufferSize = AudioTrack.getMinBufferSize(AudioHandler.SAMPLE_RATE,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-        mBufferSize = Math.min(minBufferSize, AudioHandler.FRAME_SIZE * 4);
+        mBufferSize = Math.min(minBufferSize, AudioHandler.FRAME_SIZE * 12);
         Log.v(Constants.TAG, "Using buffer size " + mBufferSize + ", system's min buffer size: " + minBufferSize);
 
         try {
-            mAudioTrack = new AudioTrack(audioStream,
-                    AudioHandler.SAMPLE_RATE,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    mBufferSize,
-                    AudioTrack.MODE_STREAM);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                AudioFormat.Builder audiofmt = new AudioFormat.Builder();
+
+                audiofmt.setChannelMask(AudioFormat.CHANNEL_OUT_MONO);
+                audiofmt.setEncoding(AudioFormat.ENCODING_PCM_16BIT);
+                audiofmt.setSampleRate(AudioHandler.SAMPLE_RATE);
+
+                AudioAttributes.Builder audioatrr = new AudioAttributes.Builder();
+                audioatrr.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION);
+                audioatrr.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
+
+                mAudioTrack = new AudioTrack(
+                        audioatrr.build(),
+                        audiofmt.build(),
+                        mBufferSize,
+                        AudioTrack.MODE_STREAM,
+                        AudioManager.AUDIO_SESSION_ID_GENERATE
+                );
+                mAudioTrack.setVolume((float)0.99);
+            } else {
+                mAudioTrack = new AudioTrack(audioStream,
+                        AudioHandler.SAMPLE_RATE,
+                        AudioFormat.CHANNEL_OUT_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT,
+                        mBufferSize,
+                        AudioTrack.MODE_STREAM);
+            }
         } catch (IllegalArgumentException e) {
             throw new AudioInitializationException(e);
         }
@@ -137,15 +162,20 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
         while(mRunning) {
             if(fetchAudio(mix, 0, mBufferSize)) {
                 mAudioTrack.write(mix, 0, mBufferSize);
+                mAudioTrack.play();
                 PreprocessingEncoder.mEcho.echo_playback(mix);
             } else {
                 synchronized (mInactiveLock) {
+                    mAudioTrack.play();
+                    mAudioTrack.pause();
                     mAudioTrack.flush();
+                    mAudioTrack.stop();
                     try {
                         mInactiveLock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    mAudioTrack.play();
                 }
             }
         }
