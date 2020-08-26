@@ -1818,7 +1818,7 @@ JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_Speex_speex_1bits_1rea
     signed char* ptr1 = arg1 == NULL ? NULL : (signed char*)env->GetDirectBufferAddress(arg1);
     jthrowable exc = NULL;
     try {
-        speex_bits_read_from((SpeexBits*)ptr0, (const char*)ptr1, arg2);
+        speex_bits_read_from((SpeexBits*)ptr0, (char*)ptr1, arg2);
     } catch (...) {
         exc = JavaCPP_handleException(env, 15);
     }
