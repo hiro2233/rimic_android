@@ -23,7 +23,7 @@ package bo.htakey.rimic.audio.inputmode;
  */
 public class ActivityInputMode implements IInputMode {
     // Continue speech for 250ms to prevent dropping.
-    private static final int SPEECH_DELAY = (int) (0.24 * Math.pow(10, 9));
+    private static final int SPEECH_DELAY = (int) (0.26 * Math.pow(10, 9));
 
     private float mVADThreshold;
     private long mVADLastDetected;
