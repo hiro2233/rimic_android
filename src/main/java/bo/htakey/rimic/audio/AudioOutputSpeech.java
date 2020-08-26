@@ -79,7 +79,7 @@ public class AudioOutputSpeech implements Callable<AudioOutputSpeech.Result> {
         mTalkStateListener = listener;
         switch (codec) {
             case UDPVoiceOpus:
-                mAudioBufferSize = AudioHandler.FRAME_SIZE * 4;
+                mAudioBufferSize = AudioHandler.FRAME_SIZE * 12;
                 mDecoder = new Opus.OpusDecoder(AudioHandler.SAMPLE_RATE, 1);
                 break;
             case UDPVoiceCELTBeta:
