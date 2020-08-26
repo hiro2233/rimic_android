@@ -14,3 +14,6 @@
 	path = libs/humla-spongycastle
 	url = https://gitlab.com/quite/humla-spongycastle.git
 	branch = pkcs12-keybag-fixes
+[submodule "src/main/jni/speexdsp"]
+	path = src/main/jni/speexdsp
+	url = https://github.com/xiph/speexdsp.git
