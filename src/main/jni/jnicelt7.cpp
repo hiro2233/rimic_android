@@ -1096,27 +1096,6 @@ JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT7_celt_1decode(JNI
     }
     return rarg;
 }
-JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT7_celt_1mode_1info(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
-    char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
-    jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
-    ptr0 += position0;
-    int* ptr2 = arg2 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
-    jint position2 = arg2 == NULL ? 0 : env->GetIntField(arg2, JavaCPP_positionFID);
-    ptr2 += position2;
-    jint rarg = 0;
-    jthrowable exc = NULL;
-    try {
-        int rvalue = celt_mode_info((const CELTMode*)ptr0, arg1, ptr2);
-        rarg = (jint)rvalue;
-    } catch (...) {
-        exc = JavaCPP_handleException(env, 14);
-    }
-
-    if (exc != NULL) {
-        env->Throw(exc);
-    }
-    return rarg;
-}
 JNIEXPORT void JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT7_celt_1decoder_1destroy(JNIEnv* env, jclass cls, jobject arg0) {
     char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
     jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
@@ -1145,6 +1124,27 @@ JNIEXPORT jobject JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT7_celt_1mode_1c
             rarg = env->AllocObject(JavaCPP_getClass(env, 1));
             env->SetLongField(rarg, JavaCPP_addressFID, ptr_to_jlong(rptr));
         }
+    } catch (...) {
+        exc = JavaCPP_handleException(env, 14);
+    }
+
+    if (exc != NULL) {
+        env->Throw(exc);
+    }
+    return rarg;
+}
+JNIEXPORT jint JNICALL Java_bo_htakey_rimic_audio_javacpp_CELT7_celt_1mode_1info(JNIEnv* env, jclass cls, jobject arg0, jint arg1, jobject arg2) {
+    char* ptr0 = arg0 == NULL ? NULL : (char*)jlong_to_ptr(env->GetLongField(arg0, JavaCPP_addressFID));
+    jint position0 = arg0 == NULL ? 0 : env->GetIntField(arg0, JavaCPP_positionFID);
+    ptr0 += position0;
+    int* ptr2 = arg2 == NULL ? NULL : (int*)jlong_to_ptr(env->GetLongField(arg2, JavaCPP_addressFID));
+    jint position2 = arg2 == NULL ? 0 : env->GetIntField(arg2, JavaCPP_positionFID);
+    ptr2 += position2;
+    jint rarg = 0;
+    jthrowable exc = NULL;
+    try {
+        int rvalue = celt_mode_info((const CELTMode*)ptr0, arg1, ptr2);
+        rarg = (jint)rvalue;
     } catch (...) {
         exc = JavaCPP_handleException(env, 14);
     }
