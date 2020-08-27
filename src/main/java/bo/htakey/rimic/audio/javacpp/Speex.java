@@ -38,7 +38,7 @@ import bo.htakey.rimic.exception.NativeAudioException;
  * Added Speex Echo Canceller interface.
  * Created by hiroshi on 23/08/2020
  */
-@Platform(library= "jnispeexdsp", cinclude={"<speex/speex.h>","<speex/speex_echo.h>","<speex/speexdsp_types.h>", "<speex/speex_bits.h>","<speex/speex_jitter.h>", "<speex/speex_preprocess.h>", "<speex/speex_resampler.h>"})
+@Platform(library= "jnispeexdsp", cinclude={"<speex/speex.h>","<speex/speex_echo.h>","<speex/speex_jitter.h>", "<speex/speex_preprocess.h>", "<speex/speex_resampler.h>"})
 public class Speex {
 
     /**
