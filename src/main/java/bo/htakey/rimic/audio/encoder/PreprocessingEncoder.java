@@ -19,7 +19,6 @@ package bo.htakey.rimic.audio.encoder;
 
 import com.googlecode.javacpp.IntPointer;
 import com.googlecode.javacpp.Pointer;
-import com.googlecode.javacpp.annotation.Cast;
 
 import java.nio.BufferUnderflowException;
 
@@ -43,33 +42,30 @@ public class PreprocessingEncoder implements IEncoder {
     public PreprocessingEncoder(IEncoder encoder, int frameSize, int sampleRate) {
         mEncoder = encoder;
         mPreprocessor = new Speex.SpeexPreprocessState(frameSize, sampleRate);
-        mEcho = new Speex.SpeexEchoState(frameSize, frameSize * 15);
+        mEcho = new Speex.SpeexEchoState(frameSize, frameSize * 24);
 
         IntPointer arg = new IntPointer(1);
 
         arg.put(sampleRate);
         mEcho.control(Speex.SpeexEchoState.SPEEX_ECHO_SET_SAMPLING_RATE, arg);
+        Pointer mpEcho = mEcho.getPointer();
+        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_ECHO_STATE, mpEcho);
+        arg.put(-60);
+        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_GET_ECHO_SUPPRESS, arg);
+        arg.put(-60);
+        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_GET_ECHO_SUPPRESS_ACTIVE, arg);
 
-        arg.put(1);
-        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_VAD, arg);
         arg.put(0);
+        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_VAD, arg);
+        arg.put(1);
         mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_AGC, arg);
         arg.put(1);
         mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_DENOISE, arg);
-        arg.put(0);
+        arg.put(1);
         mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_DEREVERB, arg);
-        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_DEREVERB_DECAY, arg);
-        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_DEREVERB_LEVEL, arg);
 
-        arg.put(sampleRate);
-        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_AGC_LEVEL, arg);
-
-        // TODO AGC max gain, decrement, noise suppress, echo
-        // Increase VAD difficulty
-        arg.put(99);
-        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_PROB_START, arg);
-        arg.put(99);
-        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_PROB_CONTINUE, arg);
+        arg.put(9000);
+        mPreprocessor.control(Speex.SpeexPreprocessState.SPEEX_PREPROCESS_SET_AGC_TARGET, arg);
     }
 
     @Override
