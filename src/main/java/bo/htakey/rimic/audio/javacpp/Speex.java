@@ -35,7 +35,7 @@ import bo.htakey.rimic.exception.NativeAudioException;
  * JavaCPP interface for Speex JNI.
  * Created by andrew on 18/10/13.
  *
- * Added Speex Echo Canceller interface.
+ * Added Speex Echo Canceller interface and SpeexDSP library.
  * Created by hiroshi on 23/08/2020
  */
 @Platform(library= "jnispeexdsp", cinclude={"<speex/speex.h>","<speex/speex_echo.h>","<speex/speex_jitter.h>", "<speex/speex_preprocess.h>", "<speex/speex_resampler.h>"})
@@ -439,7 +439,6 @@ public class Speex {
         public void destroy() {
             speex_preprocess_state_destroy(mNativeState);
         }
-
     }
 
     public static class SpeexEchoState {
@@ -478,6 +477,9 @@ public class Speex {
             speex_echo_state_destroy(mNativeState);
         }
 
+        public Pointer getPointer() {
+            return mNativeState;
+        }
     }
 
     public static class SpeexResampler {
