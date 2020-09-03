@@ -19,6 +19,7 @@ package bo.htakey.rimic.audio;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.os.Build;
 import android.util.Log;
 
 import bo.htakey.rimic.Constants;
@@ -48,12 +49,20 @@ public class AudioInput implements Runnable {
         // If it fails, keep producing AudioRecord instances until we find one that initializes
         // correctly. Maybe one day Android will let us probe for supported sample rates, as we
         // aren't even guaranteed that 44100hz will work across all devices.
-        for (int i = 0; i < SAMPLE_RATES.length + 1; i++) {
-            int sampleRate = i == 0 ? targetSampleRate : SAMPLE_RATES[i - 1];
+        for (int i = SAMPLE_RATES.length - 1; i >= 0; i--) {
+            //int sampleRate = i == 0 ? targetSampleRate : SAMPLE_RATES[i];
+            int sampleRate = SAMPLE_RATES[i];
             try {
                 mAudioRecord = setupAudioRecord(sampleRate, audioSource);
-                break;
-            } catch (AudioInitializationException e) {
+                if (targetSampleRate == sampleRate) {
+                    Log.v(Constants.TAG, "OK! mAudioRecod at: " + sampleRate + " rate");
+                    break;
+                } else if (i != 0) {
+                    mAudioRecord = null;
+                    Log.v(Constants.TAG,"Missmatch target rate at: " + sampleRate);
+                }
+            } catch (Exception e) {
+                Log.v(Constants.TAG,"Exception hardware rate at: " + sampleRate);
                 // Continue iteration, probing for a supported sample rate.
             }
         }
@@ -63,7 +72,7 @@ public class AudioInput implements Runnable {
         }
 
         int sampleRate = getSampleRate();
-        // FIXME: does not work properly if 10ms frames cannot be represented as integers
+                // FIXME: does not work properly if 10ms frames cannot be represented as integers
         mFrameSize = (sampleRate * AudioHandler.FRAME_SIZE) / AudioHandler.SAMPLE_RATE;
     }
 
@@ -71,35 +80,46 @@ public class AudioInput implements Runnable {
         int minBufferSizetmp = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO,
                                                                 AudioFormat.ENCODING_PCM_16BIT);
         int minBufferSize;
-        minBufferSize = Math.min(minBufferSizetmp, (sampleRate * AudioHandler.FRAME_SIZE) / AudioHandler.SAMPLE_RATE);
+        minBufferSize = Math.min(minBufferSizetmp, ((sampleRate * AudioHandler.FRAME_SIZE) / AudioHandler.SAMPLE_RATE) * 8);
         if (minBufferSize <= 0)
             throw new AudioInitializationException("Invalid buffer size returned (unsupported sample rate).");
 
         AudioRecord audioRecord = null;
-        boolean fail_input = false;
         try {
             audioRecord = new AudioRecord(audioSource, sampleRate, AudioFormat.CHANNEL_IN_MONO,
                                                  AudioFormat.ENCODING_PCM_16BIT, minBufferSize);
-        } catch (IllegalArgumentException e) {
-            fail_input = true;
-            minBufferSize = Math.min(minBufferSizetmp, 1024);
+            Log.v(Constants.TAG, "#1 INPUT using buf size " + minBufferSize + ", system's min buf size: " + minBufferSizetmp + ", Sample rate: " + sampleRate);
+            if(audioRecord.getState() == AudioRecord.STATE_UNINITIALIZED) {
+                audioRecord.release();
+                audioRecord = null;
+            }
+        } catch (Exception e) {
+            Log.v(Constants.TAG, "Failed input 1" + ", Sample rate: " + sampleRate);
         }
 
-        if (fail_input == true) {
+        // Try with 1024 buffer size
+        minBufferSize = Math.min(minBufferSizetmp, 1024);
+
+        if (audioRecord == null) {
             try {
                 audioRecord = new AudioRecord(audioSource, sampleRate, AudioFormat.CHANNEL_IN_MONO,
                         AudioFormat.ENCODING_PCM_16BIT, minBufferSize);
-                fail_input = false;
-            } catch (IllegalArgumentException e) {
-                fail_input = true;
+                Log.v(Constants.TAG, "#2 INPUT using buf size " + minBufferSize + ", system's min buf size: " + minBufferSizetmp + ", Sample rate: " + sampleRate);
+                if(audioRecord.getState() == AudioRecord.STATE_UNINITIALIZED) {
+                    audioRecord.release();
+                    audioRecord = null;
+                }
+            } catch (Exception e) {
+                Log.v(Constants.TAG, "Failed input 2" + ", Sample rate: " + sampleRate);
             }
         }
 
-        if (fail_input == false) {
+        if (audioRecord == null) {
             try {
                 audioRecord = new AudioRecord(audioSource, sampleRate, AudioFormat.CHANNEL_IN_MONO,
                         AudioFormat.ENCODING_PCM_16BIT, minBufferSizetmp);
-            } catch (IllegalArgumentException e) {
+                Log.v(Constants.TAG, "#3 INPUT using buf size " + minBufferSizetmp + ", system's min buf size: " + minBufferSizetmp + ", Sample rate: " + sampleRate);
+            } catch (Exception e) {
                 throw new AudioInitializationException(e);
             }
         }
@@ -109,9 +129,9 @@ public class AudioInput implements Runnable {
             throw new AudioInitializationException("AudioRecord failed to initialize!");
         }
 
+        Log.v(Constants.TAG, "Passed Sample rate: " + sampleRate);
         return audioRecord;
     }
-
     /**
      * Starts the recording thread.
      * Not thread-safe.
@@ -196,6 +216,13 @@ public class AudioInput implements Runnable {
         Log.i(Constants.TAG, "AudioInput: stopped");
     }
 
+    public int getAudioSessionId() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            return mAudioRecord.getAudioSessionId();
+        } else {
+            return 0;
+        }
+    }
     public interface AudioInputListener {
         void onAudioInputReceived(short[] frame, int frameSize);
     }
