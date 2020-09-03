@@ -40,7 +40,7 @@ LOCAL_SRC_FILES     := cb_search.c      exc_10_32_table.c   exc_8_128_table.c   
                        quant_lsp.c      sb_celp.c           speex_callbacks.c   speex_header.c \
                        window.c
 ifeq ($(TARGET_ARCH_ABI),armeabi)
-LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE_KISS_FFT -DFIXED_POINT -DEXPORT=''
+LOCAL_CFLAGS           := -march=armv7-a -mfpu=vfpv3-d16 -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE_KISS_FFT -DFIXED_POINT -DEXPORT=''
 endif
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE_SMALLFT -DFLOATING_POINT -DEXPORT='' -DUSE_NEON
@@ -72,7 +72,7 @@ LOCAL_SRC_FILES     := smallft.c		buffer.c			resample.c          jitter.c       
                        filterbank.c     scal.c \
                        $(ROOT)/jnispeexdsp.cpp
 ifeq ($(TARGET_ARCH_ABI),armeabi)
-LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE_KISS_FFT -DFIXED_POINT -DEXPORT=''
+LOCAL_CFLAGS           := -march=armv7-a -mfpu=vfpv3-d16 -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE_KISS_FFT -DFIXED_POINT -DEXPORT=''
 endif
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE_SMALLFT -DFLOATING_POINT -DEXPORT='' -DUSE_NEON
@@ -103,6 +103,9 @@ LOCAL_SRC_FILES     := bands.c celt.c cwrs.c entcode.c entdec.c entenc.c header.
                        $(ROOT)/jnicelt11.cpp
 LOCAL_C_INCLUDES    := $(ROOT)/celt-0.11.0-src/libcelt/
 LOCAL_CFLAGS        := -ffunction-sections -fdata-sections -s -I$(ROOT)/celt-0.11.0-build -DHAVE_CONFIG_H -fvisibility=hidden
+ifeq ($(TARGET_ARCH_ABI),armeabi)
+LOCAL_CFLAGS        := -march=armv7-a -mfpu=vfpv3-d16 -ffunction-sections -fdata-sections -s -I$(ROOT)/celt-0.11.0-build -DHAVE_CONFIG_H -fvisibility=hidden
+endif
 LOCAL_CPP_FEATURES := exceptions
 LOCAL_LDLIBS := -llog -latomic
 LOCAL_LD_FLAGS := -Wl,--gc-sections
@@ -125,6 +128,9 @@ LOCAL_SRC_FILES     := bands.c celt.c cwrs.c entcode.c entdec.c entenc.c header.
                        rangeenc.c rate.c vq.c $(ROOT)/jnicelt7.cpp
 LOCAL_C_INCLUDES    := $(ROOT)/celt-0.7.0-src/libcelt/
 LOCAL_CFLAGS        := -ffunction-sections -fdata-sections -s -I$(ROOT)/celt-0.7.0-build -DHAVE_CONFIG_H -fvisibility=hidden
+ifeq ($(TARGET_ARCH_ABI),armeabi)
+LOCAL_CFLAGS        := -march=armv7-a -mfpu=vfpv3-d16 -ffunction-sections -fdata-sections -s -I$(ROOT)/celt-0.7.0-build -DHAVE_CONFIG_H -fvisibility=hidden
+endif
 LOCAL_CPP_FEATURES := exceptions
 LOCAL_LDLIBS := -llog -latomic
 LOCAL_LD_FLAGS := -Wl,--gc-sections
@@ -170,7 +176,7 @@ LOCAL_C_INCLUDES    := $(LOCAL_PATH)/include $(LOCAL_PATH)/celt $(LOCAL_PATH)/si
                        $(LOCAL_PATH)/silk/float $(LOCAL_PATH)/silk/fixed
 LOCAL_SRC_FILES     := $(CELT_SOURCES) $(SILK_SOURCES) $(OPUS_SOURCES) $(ROOT)/jniopus.cpp
 ifeq ($(TARGET_ARCH_ABI),armeabi)
-LOCAL_CFLAGS        := -ffunction-sections -fdata-sections -s -DOPUS_BUILD -DVAR_ARRAYS -DFIXED_POINT
+LOCAL_CFLAGS        := -march=armv7-a -mfpu=vfpv3-d16 -ffunction-sections -fdata-sections -s -DOPUS_BUILD -DVAR_ARRAYS -DFIXED_POINT
 endif
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
 LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -DFLOAT_APPROX -DENABLE_HARDENING -DOPUS_BUILD -DVAR_ARRAYS -DOPUS_ARM_MAY_HAVE_NEON_INTR=1 -DOPUS_ARM_PRESUME_NEON_INTR=1
