@@ -19,11 +19,11 @@ package bo.htakey.rimic.protocol;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.media.audiofx.PresetReverb;
 import android.os.Build;
 import android.util.Log;
 
 import bo.htakey.rimic.Constants;
-import bo.htakey.rimic.R;
 import bo.htakey.rimic.audio.AudioInput;
 import bo.htakey.rimic.audio.AudioOutput;
 import bo.htakey.rimic.audio.encoder.CELT11Encoder;
@@ -96,6 +96,8 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
     private final Object mEncoderLock;
     private byte mTargetId;
 
+    private PresetReverb mAudioReverb;
+
     public AudioHandler(Context context, RimicLogger logger, int audioStream, int audioSource,
                         int sampleRate, int targetBitrate, int targetFramesPerPacket,
                         IInputMode inputMode, byte targetId, float amplitudeBoost,
@@ -123,7 +125,9 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         mEncoderLock = new Object();
 
         mInput = new AudioInput(this, mAudioSource, mSampleRate);
+        Log.v(Constants.TAG, "Handler Input Created");
         mOutput = new AudioOutput(mOutputListener);
+        Log.v(Constants.TAG, "Handler Output Created");
     }
 
     /**
@@ -134,15 +138,42 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         if(mInitialized) return;
         mSession = self.getSession();
 
+        Log.v(Constants.TAG, "Handler: Initializing");
         setCodec(codec);
+        Log.v(Constants.TAG, "Handler: Codec Initialized");
         setServerMuted(self.isMuted() || self.isLocalMuted() || self.isSuppressed());
         startRecording();
+        Log.v(Constants.TAG, "Handler: Recording Initialized");
 
-        mOutput.startPlaying(AudioManager.STREAM_VOICE_CALL);
-        if (mAudioStream == AudioManager.STREAM_MUSIC) {
-            mAudioManager.setSpeakerphoneOn(true);
+        mOutput.setmAudioTrackSessionID(mInput.getAudioSessionId());
+        int audiostream = mAudioStream;
+        if (mAudioManager.isWiredHeadsetOn()) {
+            audiostream = AudioManager.STREAM_VOICE_CALL;
+        }
+
+        mOutput.startPlaying(audiostream);
+        Log.v(Constants.TAG, "Handler: Playing Initialized");
+
+        mAudioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+
+        if (audiostream == AudioManager.STREAM_MUSIC) {
+            if (mAudioManager.isWiredHeadsetOn()) {
+                mAudioManager.setSpeakerphoneOn(false);
+            } else {
+                mAudioManager.setSpeakerphoneOn(true);
+            }
         } else {
             mAudioManager.setSpeakerphoneOn(false);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mAudioReverb = new PresetReverb(0, mInput.getAudioSessionId());
+            mAudioReverb.setPreset(PresetReverb.PRESET_SMALLROOM);
+            if (audiostream == AudioManager.STREAM_MUSIC) {
+                mAudioReverb.setEnabled(true);
+            } else {
+                mAudioReverb.setEnabled(false);
+            }
         }
 
         mInitialized = true;
@@ -220,16 +251,23 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
             return;
         }
 
+        String msgcodec = "";
         IEncoder encoder;
         switch (codec) {
             case UDPVoiceCELTAlpha:
+                msgcodec = "CELTAlpha";
+                Log.v(Constants.TAG, "Handler: creating codec " + msgcodec);
                 encoder = new CELT7Encoder(SAMPLE_RATE, AudioHandler.FRAME_SIZE, 1,
                         mFramesPerPacket, mBitrate, MAX_BUFFER_SIZE);
                 break;
             case UDPVoiceCELTBeta:
+                msgcodec = "CELTBeta";
+                Log.v(Constants.TAG, "Handler: creating codec " + msgcodec);
                 encoder = new CELT11Encoder(SAMPLE_RATE, 1, mFramesPerPacket);
                 break;
             case UDPVoiceOpus:
+                msgcodec = "Opus";
+                Log.v(Constants.TAG, "Handler: creating codec " + msgcodec);
                 encoder = new OpusEncoder(SAMPLE_RATE, 1, FRAME_SIZE, mFramesPerPacket, mBitrate,
                         MAX_BUFFER_SIZE);
                 break;
@@ -237,6 +275,8 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
                 Log.w(Constants.TAG, "Unsupported codec, input disabled.");
                 return;
         }
+
+        Log.v(Constants.TAG, "Handler: created " + msgcodec + " codec");
 
         if (mPreprocessorEnabled) {
             encoder = new PreprocessingEncoder(encoder, FRAME_SIZE, SAMPLE_RATE);
@@ -342,7 +382,15 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         mInitialized = false;
         mBluetoothOn = false;
 
+        if (mAudioReverb != null) {
+            mAudioReverb.setEnabled(false);
+            mAudioReverb.release();
+            mAudioReverb = null;
+        }
+
         mEncodeListener.onTalkingStateChanged(false);
+        mAudioManager.setSpeakerphoneOn(false);
+        mAudioManager.setMode(AudioManager.MODE_NORMAL);
     }
 
     @Override
@@ -353,10 +401,13 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         RimicUDPMessageType codec;
         if (msg.hasOpus() && msg.getOpus()) {
             codec = RimicUDPMessageType.UDPVoiceOpus;
+            Log.v(Constants.TAG, "UDP Opus codec");
         } else if (msg.hasBeta() && !msg.getPreferAlpha()) {
             codec = RimicUDPMessageType.UDPVoiceCELTBeta;
+            Log.v(Constants.TAG, "UDP CELTBeta codec");
         } else {
             codec = RimicUDPMessageType.UDPVoiceCELTAlpha;
+            Log.v(Constants.TAG, "UDP CELTAlpha codec");
         }
 
         if (codec != mCodec) {
