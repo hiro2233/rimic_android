@@ -48,6 +48,9 @@ endif
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
 LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -mfpu=neon-vfpv4 -D__EMX__ -DUSE_SMALLFT -DFLOATING_POINT -DEXPORT='' -DUSE_NEON
 endif
+ifeq ($(TARGET_ARCH_ABI),x86_64)
+LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE_KISS_FFT -DFIXED_POINT -DEXPORT=''
+endif
 LOCAL_CPP_FEATURES := exceptions
 LOCAL_LDLIBS := -llog -latomic
 LOCAL_LD_FLAGS := -Wl,--gc-sections
@@ -79,6 +82,9 @@ LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE
 endif
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
 LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -mfpu=neon-vfpv4 -D__EMX__ -DUSE_SMALLFT -DFLOATING_POINT -DEXPORT='' -DUSE_NEON
+endif
+ifeq ($(TARGET_ARCH_ABI),x86_64)
+LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -D__EMX__ -DUSE_KISS_FFT -DFIXED_POINT -DEXPORT=''
 endif
 LOCAL_CPP_FEATURES := exceptions
 LOCAL_LDLIBS := -llog -latomic
@@ -158,7 +164,7 @@ CELT_SOURCES += $(CELT_SOURCES_ARM)
 SILK_SOURCES += $(SILK_SOURCES_ARM)
 endif
 
-ifeq ($(TARGET_ARCH_ABI),armeabi)
+ifeq ($(TARGET_ARCH_ABI),$(filter $(TARGET_ARCH_ABI),armeabi x86_64))
 # TODO: add support for floating-point?
 SILK_SOURCES += $(SILK_SOURCES_FIXED)
 OPUS_SOURCES += $(OPUS_SOURCES_FLOAT)
@@ -183,6 +189,9 @@ LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -DFLOAT_APPROX 
 endif
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
 LOCAL_CFLAGS           := -ffunction-sections -fdata-sections -s -mfpu=neon-vfpv4 -DFLOAT_APPROX -DENABLE_HARDENING -DOPUS_BUILD -DVAR_ARRAYS -DOPUS_ARM_MAY_HAVE_NEON_INTR=1 -DOPUS_ARM_PRESUME_NEON_INTR=1
+endif
+ifeq ($(TARGET_ARCH_ABI),x86_64)
+LOCAL_CFLAGS        := -ffunction-sections -fdata-sections -s -DOPUS_BUILD -DVAR_ARRAYS -DFIXED_POINT
 endif
 LOCAL_CPP_FEATURES  := exceptions
 LOCAL_LDLIBS        := -llog -latomic
