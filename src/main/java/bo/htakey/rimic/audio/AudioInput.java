@@ -40,6 +40,8 @@ public class AudioInput implements Runnable {
 
     private Thread mRecordThread;
     private boolean mRecording;
+    private boolean vMuted;
+    private final Object mInactiveLock = new Object();
 
     public AudioInput(AudioInputListener listener, int audioSource, int targetSampleRate)
             throws NativeAudioException, AudioInitializationException {
@@ -175,6 +177,13 @@ public class AudioInput implements Runnable {
         return mRecording;
     }
 
+    public void setMuted(boolean muted) {
+        vMuted = muted;
+        synchronized (mInactiveLock) {
+            mInactiveLock.notify();
+        }
+    }
+
     /**
      * @return the sample rate used by the AudioRecord instance.
      */
@@ -203,11 +212,33 @@ public class AudioInput implements Runnable {
         final short[] mAudioBuffer = new short[mFrameSize];
         // We loop when the 'recording' instance var is true instead of checking audio record state because we want to always cleanly shutdown.
         while(mRecording) {
-            int shortsRead = mAudioRecord.read(mAudioBuffer, 0, mFrameSize);
+            int shortsRead;
+            if (vMuted) {
+                shortsRead = -1;
+            } else {
+                if (mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_STOPPED) {
+                   mAudioRecord.startRecording();
+                    Log.v(Constants.TAG, "Record started");
+                }
+                shortsRead = mAudioRecord.read(mAudioBuffer, 0, mFrameSize);
+            }
+
             if(shortsRead > 0) {
                 mListener.onAudioInputReceived(mAudioBuffer, mFrameSize);
-            } else {
+            } else if (!(shortsRead == -1)) {
                 Log.e(Constants.TAG, "Error fetching audio! AudioRecord error " + shortsRead);
+            } else {
+                if (mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
+                    mAudioRecord.stop();
+                    Log.v(Constants.TAG, "Record Stopped");
+                }
+                synchronized (mInactiveLock) {
+                    try {
+                        mInactiveLock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 
