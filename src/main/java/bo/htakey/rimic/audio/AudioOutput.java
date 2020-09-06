@@ -163,11 +163,36 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
         mAudioTrack.play();
 
         final short[] mix = new short[mBufferSize];
+        boolean isPaused = false;
+        final long inactivity_output = 30000; // Detect activity output, if no output on 30 secs, then playing stop and wait interruption.
+        long vActivityLastDetected = System.currentTimeMillis();;
 
         while(mRunning) {
-            fetchAudio(mix, 0, mBufferSize);
+            boolean fetched = fetchAudio(mix, 0, mBufferSize);
             mAudioTrack.write(mix, 0, mBufferSize);
             PreprocessingEncoder.mEcho.echo_playback(mix);
+            if(fetched) {
+                vActivityLastDetected = System.currentTimeMillis();
+            }
+
+            fetched = !((System.currentTimeMillis() - vActivityLastDetected) < inactivity_output);
+
+            if (fetched) {
+                synchronized (mInactiveLock) {
+                    mAudioTrack.pause();
+                    mAudioTrack.flush();
+                    mAudioTrack.stop();
+                    Log.v(Constants.TAG, "Output stopped");
+                    try {
+                        mInactiveLock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    vActivityLastDetected = System.currentTimeMillis();
+                    mAudioTrack.play();
+                    Log.v(Constants.TAG, "Output Playing");
+                }
+            }
         }
 
         mAudioTrack.pause();
