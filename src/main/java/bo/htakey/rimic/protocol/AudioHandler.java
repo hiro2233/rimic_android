@@ -214,6 +214,9 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
      */
     private void setServerMuted(boolean muted) throws AudioException {
         mMuted = muted;
+        synchronized (mInput) {
+            mInput.setMuted(muted);
+        }
     }
 
     /**
