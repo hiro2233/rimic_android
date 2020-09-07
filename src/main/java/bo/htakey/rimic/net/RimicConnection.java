@@ -106,6 +106,7 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
     // Latency
     private long mLastUDPPing;
     private long mLastTCPPing;
+    public static final int TIME_INTERVAL_PING = 10;
 
     // Server
     private String mHost;
@@ -138,7 +139,7 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
 
             // Start TCP/UDP ping thread. FIXME is this the right place?
             try {
-                mPingTask = mPingExecutorService.scheduleAtFixedRate(mPingRunnable, 0, 5, TimeUnit.SECONDS);
+                mPingTask = mPingExecutorService.scheduleAtFixedRate(mPingRunnable, 0, RimicConnection.TIME_INTERVAL_PING, TimeUnit.SECONDS);
             } catch(RejectedExecutionException e) {
                 Log.w(Constants.TAG, "RimicConnection fail to start ping thread, in \"shutdown\"? ", e);
             }
