@@ -23,6 +23,7 @@ import android.os.Build;
 import android.util.Log;
 
 import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.RimicService;
 import bo.htakey.rimic.exception.AudioInitializationException;
 import bo.htakey.rimic.exception.NativeAudioException;
 import bo.htakey.rimic.protocol.AudioHandler;
@@ -82,7 +83,7 @@ public class AudioInput implements Runnable {
         int minBufferSizetmp = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO,
                                                                 AudioFormat.ENCODING_PCM_16BIT);
         int minBufferSize;
-        minBufferSize = Math.min(minBufferSizetmp, ((sampleRate * AudioHandler.FRAME_SIZE) / AudioHandler.SAMPLE_RATE) * 8);
+        minBufferSize = Math.min(minBufferSizetmp, ((sampleRate * AudioHandler.FRAME_SIZE) / AudioHandler.SAMPLE_RATE) * 4);
         if (minBufferSize <= 0)
             throw new AudioInitializationException("Invalid buffer size returned (unsupported sample rate).");
 
@@ -150,6 +151,9 @@ public class AudioInput implements Runnable {
      */
     public void stopRecording() {
         if(!mRecording) return;
+        synchronized (mInactiveLock) {
+            mInactiveLock.notify();
+        }
         mRecording = false;
         try {
             mRecordThread.interrupt();
@@ -210,19 +214,21 @@ public class AudioInput implements Runnable {
             return;
 
         final short[] mAudioBuffer = new short[mFrameSize];
+
         // We loop when the 'recording' instance var is true instead of checking audio record state because we want to always cleanly shutdown.
         while(mRecording) {
-            int shortsRead;
+            int shortsRead = 0;
             if (vMuted) {
                 shortsRead = -1;
             } else {
                 if (mAudioRecord.getRecordingState() == AudioRecord.RECORDSTATE_STOPPED) {
-                   mAudioRecord.startRecording();
-                    Log.v(Constants.TAG, "Record started");
+                    mAudioRecord.startRecording();
+                    Log.v(Constants.TAG, "Record started from stopped state");
                 }
-                shortsRead = mAudioRecord.read(mAudioBuffer, 0, mFrameSize);
+                if(mAudioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
+                    shortsRead = mAudioRecord.read(mAudioBuffer, 0, mFrameSize);
+                }
             }
-
             if(shortsRead > 0) {
                 mListener.onAudioInputReceived(mAudioBuffer, mFrameSize);
             } else if (!(shortsRead == -1)) {
@@ -239,11 +245,12 @@ public class AudioInput implements Runnable {
                         e.printStackTrace();
                     }
                 }
+                RimicService.setWakeLock(RimicService.WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+                Log.v(Constants.TAG, "Record recovered");
             }
         }
 
         mAudioRecord.stop();
-
         Log.i(Constants.TAG, "AudioInput: stopped");
     }
 
