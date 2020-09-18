@@ -92,6 +92,32 @@ LOCAL_STATIC_LIBRARIES := jnispeex
 LOCAL_LD_FLAGS := -Wl,--gc-sections
 include $(BUILD_SHARED_LIBRARY)
 
+# log mon
+include $(CLEAR_VARS)
+ifeq ($(TARGET_ARCH),arm)
+LOCAL_ARM_MODE := arm
+endif
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_ARM_NEON := true
+endif
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+#LOCAL_ARM_NEON := true
+endif
+LOCAL_PATH          := $(ROOT)/logmon
+LOCAL_MODULE        := jnilogmon
+LOCAL_SRC_FILES     := 	logmon.cpp \
+						$(ROOT)/jnilogmon.cpp
+LOCAL_C_INCLUDES    := $(ROOT)/logmon
+LOCAL_CFLAGS        := -ffunction-sections -fdata-sections -s
+ifeq ($(TARGET_ARCH_ABI),armeabi)
+LOCAL_CFLAGS        := -march=armv7-a -mfpu=vfpv3-d16 -ffunction-sections -fdata-sections -s
+endif
+LOCAL_CPP_FEATURES := exceptions
+LOCAL_LDLIBS := -llog -latomic
+LOCAL_LD_FLAGS := -Wl,--gc-sections
+include $(BUILD_SHARED_LIBRARY)
+
+
 include $(CLEAR_VARS)
 ifeq ($(TARGET_ARCH),arm)
 LOCAL_ARM_MODE := arm

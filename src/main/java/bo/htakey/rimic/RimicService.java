@@ -17,14 +17,18 @@
 
 package bo.htakey.rimic;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,6 +40,7 @@ import android.util.Log;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import bo.htakey.rimic.audio.AudioOutput;
@@ -45,6 +50,7 @@ import bo.htakey.rimic.audio.inputmode.ContinuousInputMode;
 import bo.htakey.rimic.audio.inputmode.IInputMode;
 import bo.htakey.rimic.audio.inputmode.ToggleInputMode;
 import bo.htakey.rimic.audio.javacpp.CELT7;
+import bo.htakey.rimic.audio.javacpp.Logmon;
 import bo.htakey.rimic.exception.AudioException;
 import bo.htakey.rimic.exception.NotConnectedException;
 import bo.htakey.rimic.exception.NotSynchronizedException;
@@ -63,11 +69,11 @@ import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.protobuf.Mumble;
 import bo.htakey.rimic.protocol.AudioHandler;
 import bo.htakey.rimic.protocol.ModelHandler;
+import bo.htakey.rimic.util.IRimicObserver;
 import bo.htakey.rimic.util.RimicCallbacks;
 import bo.htakey.rimic.util.RimicDisconnectedException;
 import bo.htakey.rimic.util.RimicException;
 import bo.htakey.rimic.util.RimicLogger;
-import bo.htakey.rimic.util.IRimicObserver;
 import bo.htakey.rimic.util.VoiceTargetMode;
 
 public class RimicService extends Service implements IRimicService, IRimicSession, RimicConnection.RimicConnectionListener, RimicLogger, BluetoothScoReceiver.Listener {
@@ -114,6 +120,15 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     /** A list of users that should be local ignored upon connection. */
     public static final String EXTRAS_LOCAL_IGNORE_HISTORY = "local_ignore_history";
     public static final String EXTRAS_ENABLE_PREPROCESSOR = "enable_preprocessor";
+    public static final String WAKE_UP_ACTION = "bo.htakey.rimic.RimicService.WAKE_UP_ACTION";
+    public static final String WAKE_UP_CONNECT = "bo.htakey.rimic.RimicService.WAKE_UP_CONNECT";
+
+    public enum WAKE_TYPE {
+        ACQUIRE_PERMANENT,
+        RELEASE,
+        SET_TIME_ACQUIRE,
+        TRY_ACQUIRE_TIME
+    }
 
     // Service settings
     private Server mServer;
@@ -137,7 +152,20 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     private byte mVoiceTargetId;
     private WhisperTargetList mWhisperTargetList;
 
-    private PowerManager.WakeLock mWakeLock;
+    private static final Object vObjectLockWake = new Object();
+    private static final Object vObjectLockWifi = new Object();
+    private static final Object vObjectLockDelay = new Object();
+    private static final Object vObjectLockReceiver = new Object();
+    private static final Object vObjectLockConnect = new Object();
+    private static final Object vObjectLockDiconnect = new Object();
+    private static final Object vObjectLockinMistake = new Object();
+    private static PowerManager.WakeLock mWakeLock;
+    private static android.net.wifi.WifiManager.WifiLock mWifiLock;
+    private static PowerManager.WakeLock vWakeLockScreen;
+    private AlarmManager vAm;
+    private PendingIntent vPi;
+    private static final Logmon.cLogMon logMon = new Logmon.cLogMon();
+
     private Handler mHandler;
     private RimicCallbacks mCallbacks;
 
@@ -152,6 +180,121 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     private ContinuousInputMode mContinuousInputMode;
 
     private boolean mReconnecting;
+    private boolean inProcConnect;
+    private static boolean inMistakeConnection;
+    private static int vMistakeCntConn;
+    //private static final ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
+
+    private RimicWakeUpMon vRimicWakeUpMon = new RimicWakeUpMon();
+    private TicksReceiver vTicksReceiverMin = new TicksReceiver();
+
+    public static boolean isInMistakeConnection() {
+        boolean mistake;
+        synchronized (vObjectLockinMistake) {
+            mistake = inMistakeConnection;
+        }
+        return mistake;
+    }
+
+    public static int getMistakeCntConn() {
+        int mistakeCnt;
+        synchronized (vObjectLockinMistake) {
+            mistakeCnt = vMistakeCntConn;
+        }
+        return mistakeCnt;
+    }
+
+    public static void increaseMistakeCntConn() {
+        synchronized (vObjectLockinMistake) {
+            vMistakeCntConn++;
+        }
+    }
+
+    public void delay(long millis, int type)
+    {
+        synchronized (vObjectLockDelay) {
+            if (type == 0) {
+                long now = System.currentTimeMillis();
+                while ((System.currentTimeMillis() - now) < millis) {
+                }
+            } else if (type == 1) {
+                try {
+                    Thread.sleep(millis);
+                } catch (InterruptedException e) {
+                    //Restore interrupt status.
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    public class TicksReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            synchronized (vObjectLockReceiver) {
+                if (vMistakeCntConn > 1) {
+                    setWakeLock(WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+                }
+                if (inProcConnect || mConnectionState == ConnectionState.CONNECTING) {
+                    return;
+                }
+
+                final String iAction = intent.getAction();
+                final boolean fireConnect = intent.getBooleanExtra(RimicService.WAKE_UP_ACTION, false);
+
+                try {
+                    ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
+                    AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                    if (am != null && !am.isMusicActive()) {
+                        try {
+                            if (RimicService.WAKE_UP_ACTION.equals(intent.getAction())) {
+                                tn.startTone(ToneGenerator.TONE_DTMF_2, 250);
+                            } else {
+                                tn.startTone(ToneGenerator.TONE_DTMF_5, 250);
+                            }
+                            delay(250, 0);
+                            tn.stopTone();
+                            delay(250, 0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
+
+                Calendar calendar = Calendar.getInstance();
+                Log.i(Constants.TAG, "vTicksReceiverMin Before: " + mReconnecting + " Fire connect: " + fireConnect + " Intent action: " + iAction + " - " + calendar.getTime().toGMTString());
+
+                if (!mReconnecting) {
+                    tryUnregisterReceiver(this);
+
+                    if (!inMistakeConnection) {
+                    /*
+                        if (vAm != null && vPi != null) {
+                            vAm.cancel(vPi);
+                            vAm = null;
+                        }
+                    */
+                    } else {
+                        Log.i(Constants.TAG, "vTicksReceiverMin: in Mistake Connection hold");
+                    }
+
+                    Log.i(Constants.TAG, "Unregistered Broadcast vTicksReceiverMin - Intent Action: " + iAction);
+                    return;
+                }
+
+                Log.i(Constants.TAG, "vTicksReceiverMin After: " + mReconnecting + " Fire connect: " + fireConnect + " Intent action: " + iAction + " - " + calendar.getTime().toGMTString());
+
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected()) {
+                    calendar.setTimeInMillis(System.currentTimeMillis());
+                    Log.v(Constants.TAG, "vTicksReceiverMin Connectivity restored, attempting reconnect " + " - " + mReconnecting + " Fire connect: " + fireConnect + " - " + calendar.getTime().toGMTString());
+                    connect();
+                }
+            }
+        }
+    };
 
     /**
      * Listen for connectivity changes in the reconnection state, and reconnect accordingly.
@@ -159,15 +302,43 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     private BroadcastReceiver mConnectivityReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (!mReconnecting) {
-                unregisterReceiver(this);
-                return;
-            }
+            synchronized (vObjectLockReceiver) {
+                if (vMistakeCntConn > 1) {
+                    setWakeLock(WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+                }
+                if (inProcConnect || mConnectionState == ConnectionState.CONNECTING) {
+                    return;
+                }
 
-            ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-            if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected()) {
-                Log.v(Constants.TAG, "Connectivity restored, attempting reconnect.");
-                connect();
+                final String iAction = intent.getAction();
+
+                if (!mReconnecting) {
+                    tryUnregisterReceiver(this);
+
+                    if (!inMistakeConnection) {
+                    /*
+                        if (vAm != null && vPi != null) {
+                            vAm.cancel(vPi);
+                            vAm = null;
+                        }
+                     */
+                    } else {
+                        Log.i(Constants.TAG, "mConnectivityReceiver: in Mistake Connection hold");
+                    }
+                    Log.i(Constants.TAG, "Unregistered Broadcast - Connectivity Recv");
+                    return;
+                }
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(System.currentTimeMillis());
+                Log.i(Constants.TAG, "Connectivity Recv: " + mReconnecting + " Intent action: " + iAction + " - " + calendar.getTime().toGMTString());
+
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected()) {
+                    calendar.setTimeInMillis(System.currentTimeMillis());
+                    Log.v(Constants.TAG, "Connectivity restored, attempting reconnect. " + " - " + mReconnecting + " - " + calendar.getTime().toGMTString());
+                    connect();
+                }
             }
         }
     };
@@ -247,11 +418,185 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         return START_NOT_STICKY;
     }
 
+    private void setAlarm(long time) {
+        try {
+            IntentFilter intentWakeUpFilterMon = new IntentFilter();
+            intentWakeUpFilterMon.addAction(RimicWakeUpMon.WAKE_UP_ACTION_MON);
+            intentWakeUpFilterMon.addAction(RimicService.WAKE_UP_ACTION);
+            intentWakeUpFilterMon.addAction(Intent.ACTION_SCREEN_ON);
+            intentWakeUpFilterMon.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            //intentWakeUpFilterMon.addAction(WifiManager.RSSI_CHANGED_ACTION);
+            //intentWakeUpFilterMon.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+            //intentWakeUpFilterMon.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                //intentWakeUpFilterMon.addAction(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
+            //}
+            registerReceiver(vRimicWakeUpMon, intentWakeUpFilterMon);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            IntentFilter intentWakeUpFilter = new IntentFilter();
+            intentWakeUpFilter.addAction(RimicService.WAKE_UP_ACTION);
+            if (vMistakeCntConn > 1) {
+                setWakeLock(WAKE_TYPE.SET_TIME_ACQUIRE, 180000);
+            }
+            if (vMistakeCntConn > 2) {
+                setWiFiLock(WAKE_TYPE.ACQUIRE_PERMANENT);
+                //intentWakeUpFilter.addAction(WifiManager.RSSI_CHANGED_ACTION);
+                intentWakeUpFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+                intentWakeUpFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+                intentWakeUpFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    //intentWakeUpFilter.addAction(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
+                //}
+            }
+            //if (vMistakeCntConn > 4) {
+                //intentWakeUpFilter.addAction(Intent.ACTION_TIME_TICK);
+            //}
+            //intentWakeUpFilter.addAction(Intent.ACTION_SCREEN_ON);
+            //intentWakeUpFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+            //intentWakeUpFilter.setPriority(90000);
+            registerReceiver(vTicksReceiverMin, intentWakeUpFilter);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Context context = getApplicationContext();
+            Intent vAmIntent = new Intent();
+            vAmIntent.setAction(RimicService.WAKE_UP_ACTION);
+            vAmIntent.putExtra(RimicService.WAKE_UP_CONNECT, true);
+
+            vPi = PendingIntent.getBroadcast(context, 0, vAmIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            vAm = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            //long intervalTime = mAutoReconnectDelay * 3;
+            long startTime = System.currentTimeMillis() + time;
+            vAm.setInexactRepeating(AlarmManager.RTC_WAKEUP, startTime, time, vPi);
+            //vAm.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time, time, vPi);
+            //vAm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + time, vPi);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        Log.v(Constants.TAG, "Alarm is set");
+    }
+
+    /**
+     * Try to unregister receiver with illegal argument exception catching.
+     * @param br:
+     * Broadcaste to try unregister.
+     */
+    private void tryUnregisterReceiver(BroadcastReceiver br) {
+        try {
+            unregisterReceiver(br);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Set wake up CPU at specified time in milliseconds and types.
+     * @param wakeType:
+     * SET_TIME_ACQUIRE: Acquire screen lock with timeout spcified in milliseconds.
+     * RELEASE: Release if lock is hold.
+     */
+    public static void setWakeScreen(WAKE_TYPE wakeType, int millis) {
+        synchronized (vObjectLockWifi) {
+            if (vWakeLockScreen == null) {
+                return;
+            }
+            if (vWakeLockScreen.isHeld()) {
+                vWakeLockScreen.release();
+            }
+            if (wakeType == WAKE_TYPE.SET_TIME_ACQUIRE) {
+                vWakeLockScreen.acquire(millis);
+            }
+        }
+    }
+
+    /**
+     * Set wake up CPU at specified time in milliseconds and types.
+     * @param wakeType:
+     * SET_TIME_ACQUIRE: Acquire wake lock with timeout spcified in milliseconds.
+     * ACQUIRE_PERMANENT: Acquire wake lock forever.
+     * RELEASE: Release if lock is hold.
+     */
+    public static void setWakeLock(WAKE_TYPE wakeType, long millis) {
+        if (wakeType == WAKE_TYPE.SET_TIME_ACQUIRE) {
+            setWakeLock(true, millis);
+        }
+        if (wakeType == WAKE_TYPE.TRY_ACQUIRE_TIME) {
+            setWakeLock(false, millis);
+        }
+    }
+
+    public static void setWakeLock(WAKE_TYPE wakeType) {
+        if (wakeType == WAKE_TYPE.ACQUIRE_PERMANENT) {
+            setWakeLock(true, 0);
+        }
+        if (wakeType == WAKE_TYPE.RELEASE) {
+            setWakeLock(false, 0);
+        }
+    }
+
+    public static void setWakeLock(boolean lock, long millis) {
+        synchronized (vObjectLockWake) {
+            if (mWakeLock == null) {
+                return;
+            }
+            if (!lock && millis > 0) {
+                if (!mWakeLock.isHeld()) {
+                    mWakeLock.acquire(millis);
+                }
+                return;
+            }
+            if (mWakeLock.isHeld()) {
+                mWakeLock.release();
+            }
+            if (lock) {
+                if (millis <= 0) {
+                    mWakeLock.acquire();
+                } else {
+                    mWakeLock.acquire(millis);
+                }
+            }
+        }
+    }
+
+    /**
+     * Set acquire WiFi lock with specified wake type.
+     * @param wakeType:
+     * ACQUIRE_PERMANENT: set WiFi wake forever.
+     * RELEASE: Implicit released if specified.
+     */
+    public static void setWiFiLock(WAKE_TYPE wakeType) {
+        synchronized (vObjectLockWifi) {
+            if (mWifiLock == null) {
+                return;
+            }
+            if (mWifiLock.isHeld()) {
+                mWifiLock.release();
+            }
+            if (wakeType == WAKE_TYPE.ACQUIRE_PERMANENT) {
+                mWifiLock.acquire();
+            }
+        }
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        inMistakeConnection = false;
+        vMistakeCntConn = 0;
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Rimic:RimicService");
+        mWakeLock.setReferenceCounted(false);
+        Context appContext = getApplicationContext();
+        WifiManager wifiManager = (WifiManager) appContext.getSystemService(WIFI_SERVICE);
+        mWifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Rimic:RimicService");
+        mWifiLock.setReferenceCounted(false);
+        vWakeLockScreen = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Rimic:RimicService");
         mHandler = new Handler(getMainLooper());
         mCallbacks = new RimicCallbacks();
         mAudioBuilder = new AudioHandler.Builder()
@@ -270,7 +615,20 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(mBluetoothReceiver);
+        tryUnregisterReceiver(mBluetoothReceiver);
+        //tryUnregisterReceiver(mConnectivityReceiver);
+        tryUnregisterReceiver(vRimicWakeUpMon);
+        tryUnregisterReceiver(vTicksReceiverMin);
+        try {
+            if (vAm != null && vPi != null) {
+                vAm.cancel(vPi);
+                vAm = null;
+                vPi = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        logMon.stopTicks();
         super.onDestroy();
     }
 
@@ -279,36 +637,65 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     }
 
     protected void connect() {
-        try {
-            setReconnecting(false);
-            mConnectionState = ConnectionState.DISCONNECTED;
-            mVoiceTargetId = 0;
-            mWhisperTargetList.clear();
+        synchronized (vObjectLockConnect) {
+            if (inProcConnect || mConnectionState == ConnectionState.CONNECTING) {
+                return;
+            }
+            inProcConnect = true;
+            try {
+                setReconnecting(false);
+                mConnectionState = ConnectionState.DISCONNECTED;
+                mVoiceTargetId = 0;
+                mWhisperTargetList.clear();
 
-            mConnection = new RimicConnection(this);
-            mConnection.setForceTCP(mForceTcp);
-            mConnection.setUseTor(mUseTor);
-            mConnection.setKeys(mCertificate, mCertificatePassword);
-            mConnection.setTrustStore(mTrustStore, mTrustStorePassword, mTrustStoreFormat);
+                mConnection = new RimicConnection(this);
+                mConnection.setForceTCP(mForceTcp);
+                mConnection.setUseTor(mUseTor);
+                mConnection.setKeys(mCertificate, mCertificatePassword);
+                mConnection.setTrustStore(mTrustStore, mTrustStorePassword, mTrustStoreFormat);
 
-            mModelHandler = new ModelHandler(this, mCallbacks, this,
-                    mLocalMuteHistory, mLocalIgnoreHistory);
-            mConnection.addTCPMessageHandlers(mModelHandler);
+                mModelHandler = new ModelHandler(this, mCallbacks, this,
+                        mLocalMuteHistory, mLocalIgnoreHistory);
+                mConnection.addTCPMessageHandlers(mModelHandler);
 
-            mConnectionState = ConnectionState.CONNECTING;
+                mConnectionState = ConnectionState.CONNECTING;
 
-            mCallbacks.onConnecting();
+                mCallbacks.onConnecting();
 
-            mConnection.connect(mServer.getSrvHost(), mServer.getSrvPort());
-        } catch (RimicException e) {
-            e.printStackTrace();
-            mCallbacks.onDisconnected(e);
+                mConnection.connect(mServer.getSrvHost(), mServer.getSrvPort());
+            } catch (RimicException e) {
+                e.printStackTrace();
+                mCallbacks.onDisconnected(e);
+            }
+            inProcConnect = false;
         }
     }
 
     public void disconnect() {
-        if (mConnection != null) {
-            mConnection.disconnect();
+        synchronized (vObjectLockDiconnect) {
+            if (mConnection != null) {
+                mConnection.disconnect();
+
+                if (!inMistakeConnection) {
+                    tryUnregisterReceiver(mBluetoothReceiver);
+                    //tryUnregisterReceiver(mConnectivityReceiver);
+                    tryUnregisterReceiver(vRimicWakeUpMon);
+                    tryUnregisterReceiver(vTicksReceiverMin);
+                    try {
+                        if (vAm != null && vPi != null) {
+                            vAm.cancel(vPi);
+                            vAm = null;
+                            vPi = null;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    vMistakeCntConn = 0;
+                    logMon.stopTicks();
+                } else {
+                    Log.i(Constants.TAG, "Disconnect: in Mistake Connection hold");
+                }
+            }
         }
     }
 
@@ -326,11 +713,16 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
 
     @Override
     public void onConnectionEstablished() {
+        inMistakeConnection = false;
+        synchronized (vObjectLockinMistake) {
+            vMistakeCntConn = 0;
+        }
+        logMon.startTicks(1,1);
         // Send version information and authenticate.
         final Mumble.Version.Builder version = Mumble.Version.newBuilder();
         version.setRelease(mClientName);
         version.setVersion(Constants.PROTOCOL_VERSION);
-        version.setOs("Android");
+        version.setOs("Android-" + Build.MODEL + "-" + Build.MANUFACTURER);
         version.setOsVersion(Build.VERSION.RELEASE);
 
         final Mumble.Authenticate.Builder auth = Mumble.Authenticate.newBuilder();
@@ -362,7 +754,41 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         mConnectionState = ConnectionState.CONNECTED;
 
         Log.v(Constants.TAG, "Connected");
-        mWakeLock.acquire();
+
+        //tryUnregisterReceiver(mConnectivityReceiver);
+        tryUnregisterReceiver(vRimicWakeUpMon);
+        tryUnregisterReceiver(vTicksReceiverMin);
+
+        try {
+            if (vAm != null && vPi != null) {
+                vAm.cancel(vPi);
+                vAm = null;
+                vPi = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        setWakeLock(WAKE_TYPE.SET_TIME_ACQUIRE, 180000);
+
+        try {
+            ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            if (am != null && !am.isMusicActive()) {
+                try {
+                    tn.startTone(ToneGenerator.TONE_DTMF_8, 300);
+                    delay(300, 0);
+                    tn.stopTone();
+                    tn.startTone(ToneGenerator.TONE_DTMF_9, 400);
+                    delay(400, 0);
+                    tn.stopTone();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
 
         try {
             mAudioHandler = mAudioBuilder.initialize(
@@ -389,24 +815,22 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     @Override
     public void onConnectionDisconnected(RimicException e) {
         if (e != null) {
-            Log.e(Constants.TAG, "Error: " + e.getMessage() +
+            Log.e(Constants.TAG, "Service Error: " + e.getMessage() +
                     " (reason: " + e.getReason().name() + ")");
             mConnectionState = ConnectionState.CONNECTION_LOST;
 
             setReconnecting(mAutoReconnect
                     && e.getReason() == RimicException.RimicDisconnectReason.CONNECTION_ERROR);
         } else {
-            Log.v(Constants.TAG, "Disconnected");
+            Log.v(Constants.TAG, "Service Disconnected");
             mConnectionState = ConnectionState.DISCONNECTED;
-        }
-
-        if(mWakeLock.isHeld()) {
-            mWakeLock.release();
         }
 
         if (mAudioHandler != null) {
             mAudioHandler.shutdown();
         }
+
+        setWakeLock(WAKE_TYPE.RELEASE);
 
         mModelHandler = null;
         mAudioHandler = null;
@@ -442,38 +866,35 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     }
 
     public void setReconnecting(boolean reconnecting) {
+        if (vMistakeCntConn > 1) {
+            setWakeLock(WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+            setWakeScreen(WAKE_TYPE.SET_TIME_ACQUIRE, 10000);
+        }
+
+        if (mReconnecting) {
+            synchronized (vObjectLockinMistake) {
+                vMistakeCntConn++;
+            }
+        }
+
         if (mReconnecting == reconnecting)
             return;
 
         mReconnecting = reconnecting;
         if (reconnecting) {
+            setAlarm(120000);
+            inMistakeConnection = true;
+            synchronized (vObjectLockinMistake) {
+                vMistakeCntConn++;
+            }
             ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
             NetworkInfo info = cm.getActiveNetworkInfo();
             if (info != null && info.isConnected()) {
                 Log.v(Constants.TAG, "Connection lost due to non-connectivity issue. Start reconnect polling.");
-                Handler mainHandler = new Handler();
-                mainHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mReconnecting) connect();
-                    }
-                }, mAutoReconnectDelay);
             } else {
                 // In the event that we've lost connectivity, don't poll. Wait until network
                 // returns before we resume connection attempts.
                 Log.v(Constants.TAG, "Connection lost due to connectivity issue. Waiting until network returns.");
-                try {
-                    registerReceiver(mConnectivityReceiver,
-                            new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            try {
-                unregisterReceiver(mConnectivityReceiver);
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -723,6 +1144,24 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     @Override
     public void cancelReconnect() {
         setReconnecting(false);
+        //tryUnregisterReceiver(mConnectivityReceiver);
+        tryUnregisterReceiver(vRimicWakeUpMon);
+        tryUnregisterReceiver(vTicksReceiverMin);
+        try {
+            if (vAm != null && vPi != null) {
+                vAm.cancel(vPi);
+                vAm = null;
+                vPi = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        synchronized (vObjectLockinMistake) {
+            inMistakeConnection = false;
+            vMistakeCntConn = 0;
+        }
+        Log.i(Constants.TAG, "Cancel Reconnecting");
+        logMon.stopTicks();
     }
 
     @Override
