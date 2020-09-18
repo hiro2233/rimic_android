@@ -42,7 +42,7 @@ import bo.htakey.rimic.Constants;
 public class RimicUDP implements Runnable {
     private static final String TAG = "RimicUDP";
 
-    private static final int BUFFER_SIZE = 2048;
+    private static final int BUFFER_SIZE = 1024;
     private final CryptState mCryptState;
 
     private DatagramSocket mUDPSocket;
