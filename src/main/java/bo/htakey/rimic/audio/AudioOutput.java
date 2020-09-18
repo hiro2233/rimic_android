@@ -41,14 +41,15 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import bo.htakey.rimic.Constants;
+import bo.htakey.rimic.RimicService;
+import bo.htakey.rimic.audio.encoder.PreprocessingEncoder;
 import bo.htakey.rimic.exception.AudioInitializationException;
 import bo.htakey.rimic.exception.NativeAudioException;
 import bo.htakey.rimic.model.TalkState;
 import bo.htakey.rimic.model.User;
-import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.net.PacketBuffer;
+import bo.htakey.rimic.net.RimicUDPMessageType;
 import bo.htakey.rimic.protocol.AudioHandler;
-import bo.htakey.rimic.audio.encoder.PreprocessingEncoder;
 
 /**
  * Created by andrew on 16/07/13.
@@ -163,14 +164,20 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
         mAudioTrack.play();
 
         final short[] mix = new short[mBufferSize];
-        boolean isPaused = false;
         final long inactivity_output = 30000; // Detect activity output, if no output on 30 secs, then playing stop and wait interruption.
         long vActivityLastDetected = System.currentTimeMillis();;
 
         while(mRunning) {
             boolean fetched = fetchAudio(mix, 0, mBufferSize);
-            mAudioTrack.write(mix, 0, mBufferSize);
-            PreprocessingEncoder.mEcho.echo_playback(mix);
+            try {
+                mAudioTrack.write(mix, 0, mBufferSize);
+                if (PreprocessingEncoder.mEcho != null) {
+                    PreprocessingEncoder.mEcho.echo_playback(mix);
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+
             if(fetched) {
                 vActivityLastDetected = System.currentTimeMillis();
             }
@@ -178,26 +185,28 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
             fetched = !((System.currentTimeMillis() - vActivityLastDetected) < inactivity_output);
 
             if (fetched) {
+                mAudioTrack.pause();
+                mAudioTrack.flush();
+                mAudioTrack.stop();
+                Log.v(Constants.TAG, "Synch Output stopped");
                 synchronized (mInactiveLock) {
-                    mAudioTrack.pause();
-                    mAudioTrack.flush();
-                    mAudioTrack.stop();
-                    Log.v(Constants.TAG, "Output stopped");
                     try {
                         mInactiveLock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    vActivityLastDetected = System.currentTimeMillis();
-                    mAudioTrack.play();
-                    Log.v(Constants.TAG, "Output Playing");
                 }
+                RimicService.setWakeLock(RimicService.WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+                vActivityLastDetected = System.currentTimeMillis();
+                mAudioTrack.play();
+                Log.v(Constants.TAG, "Output Playing");
             }
         }
 
         mAudioTrack.pause();
         mAudioTrack.flush();
         mAudioTrack.stop();
+        Log.v(Constants.TAG, "Main Output Stopped");
     }
 
     /**
@@ -229,15 +238,19 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
                     speech.destroy();
                 }
             }
-            mPacketLock.unlock();
+            //mPacketLock.unlock();
         } catch (InterruptedException e) {
             Log.v(Constants.TAG, "InterruptedException on FetchAudio " + e.getMessage());
             e.printStackTrace();
+            mPacketLock.unlock();
             return false;
         } catch (ExecutionException e) {
             Log.v(Constants.TAG, "ExecutionException on FetchAudio " + e.getMessage());
             e.printStackTrace();
+            mPacketLock.unlock();
             return false;
+        } finally {
+            mPacketLock.unlock();
         }
 
         if (sources.size() == 0)
@@ -281,10 +294,11 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
                     Log.v(Constants.TAG, "Created audio user "+user.getName());
                     mAudioOutputs.put(session, aop);
                 }
-                mPacketLock.unlock();
+                //mPacketLock.unlock();
                 PacketBuffer dataBuffer = new PacketBuffer(pds.bufferBlock(pds.left()));
                 aop.addFrameToBuffer(dataBuffer, msgFlags, seq);
             } finally {
+                mPacketLock.unlock();
             }
 
             synchronized (mInactiveLock) {
