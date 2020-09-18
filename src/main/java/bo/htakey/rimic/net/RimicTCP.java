@@ -27,7 +27,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.security.cert.X509Certificate;
 
@@ -125,7 +124,7 @@ public class RimicTCP extends RimicNetworkThread {
                 }
             }
         } catch (SocketException e) {
-            error("Could not open a connection to the host", e);
+            error("TCP: Could not open a connection to the host", e);
         } catch (SSLHandshakeException e) {
             // Try and verify certificate manually.
             if(mSocketFactory.getServerChain() != null && mListener != null) {
@@ -137,10 +136,10 @@ public class RimicTCP extends RimicNetworkThread {
                     }
                 });
             } else {
-                error("Could not verify host certificate", e);
+                error("TCP: Could not verify host certificate", e);
             }
         } catch (IOException e) {
-            error("An error occurred when communicating with the host", e);
+            error("TCP: An error occurred when communicating with the host", e);
         } finally {
             mConnected = false;
             try {
@@ -172,7 +171,7 @@ public class RimicTCP extends RimicNetworkThread {
             @Override
             public void run() {
                 if (!RimicConnection.UNLOGGED_MESSAGES.contains(messageType))
-                    Log.v(Constants.TAG, "OUT: " + messageType);
+                    Log.v(Constants.TAG, "TCP OUT: " + messageType);
                 try {
                     mDataOutput.writeShort(messageType.ordinal());
                     mDataOutput.writeInt(message.getSerializedSize());
@@ -195,7 +194,7 @@ public class RimicTCP extends RimicNetworkThread {
             @Override
             public void run() {
                 if (!RimicConnection.UNLOGGED_MESSAGES.contains(messageType))
-                    Log.v(Constants.TAG, "OUT: " + messageType);
+                    Log.v(Constants.TAG, "TCP OUT: " + messageType);
                 try {
                     mDataOutput.writeShort(messageType.ordinal());
                     mDataOutput.writeInt(length);
