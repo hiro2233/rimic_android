@@ -106,7 +106,8 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
     // Latency
     private long mLastUDPPing;
     private long mLastTCPPing;
-    public static final int TIME_INTERVAL_PING = 10;
+
+    private static final int TIME_INTERVAL_PING = 5;
 
     // Server
     private String mHost;
@@ -118,6 +119,8 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
     private int mMaxBandwidth;
     private RimicUDPMessageType mCodec;
 
+    private static long vCrypSetupLastTime;
+    private static int vCntCryptSetupTimout;
     // Session
     private int mSession;
 
@@ -154,7 +157,6 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
                     mListener.onConnectionSynchronized();
                 }
             });
-
         }
 
         @Override
@@ -183,6 +185,17 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
 
         @Override
         public void messageCryptSetup(Mumble.CryptSetup msg) {
+            long now = System.currentTimeMillis();
+            if ((now - vCrypSetupLastTime) < 15000) {
+                vCntCryptSetupTimout++;
+            }
+            if (vCntCryptSetupTimout > 3) {
+                Log.i(Constants.TAG, "Disconnected: CryptSetup redundant");
+                mListener.onConnectionDisconnected(new RimicException("Disconnected: CryptSetup redundant", RimicException.RimicDisconnectReason.CONNECTION_ERROR));
+                disconnect();
+                return;
+            }
+            vCrypSetupLastTime = System.currentTimeMillis();
             try {
                 if(msg.hasKey() && msg.hasClientNonce() && msg.hasServerNonce()) {
                     ByteString key = msg.getKey();
@@ -268,7 +281,6 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
     private Runnable mPingRunnable = new Runnable() {
         @Override
         public void run() {
-
             // In microseconds
             long t = getElapsed();
 
@@ -325,6 +337,8 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
         mExceptionHandled = false;
         mUsingUDP = !shouldForceTCP();
         mStartTimestamp = System.nanoTime();
+        vCntCryptSetupTimout = 0;
+        vCrypSetupLastTime = 0;
 
         mPingExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -490,6 +504,8 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
         mTCP = null;
         mUDP = null;
         mPingTask = null;
+        vCntCryptSetupTimout = 0;
+        vCrypSetupLastTime = 0;
     }
 
     /**
@@ -502,6 +518,7 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
         mError = e;
 
         e.printStackTrace();
+        Log.i(Constants.TAG, "Fatal Connection Disconnected Error: " + e.getMessage());
         mListener.onConnectionDisconnected(e);
 
         disconnect();
@@ -609,7 +626,7 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
     @Override
     public void onTCPMessageReceived(RimicTCPMessageType type, int length, byte[] data) {
         if(!UNLOGGED_MESSAGES.contains(type))
-            Log.v(Constants.TAG, "IN: "+type);
+            Log.v(Constants.TAG, "TCP IN: "+type);
 
         if(type == RimicTCPMessageType.UDPTunnel) {
             onUDPDataReceived(data);
@@ -644,6 +661,7 @@ public class RimicConnection implements RimicTCP.TCPConnectionListener, RimicUDP
         disconnect();
         if(mListener != null) {
             mListener.onConnectionHandshakeFailed(chain);
+            Log.i(Constants.TAG, "TLS Connection Disconnected");
             mListener.onConnectionDisconnected(null);
         }
     }
