@@ -19,8 +19,6 @@ package bo.htakey.rimic.protocol;
 
 import android.content.Context;
 import android.media.AudioManager;
-import android.media.audiofx.PresetReverb;
-import android.os.Build;
 import android.util.Log;
 
 import bo.htakey.rimic.Constants;
@@ -37,9 +35,9 @@ import bo.htakey.rimic.exception.AudioException;
 import bo.htakey.rimic.exception.AudioInitializationException;
 import bo.htakey.rimic.exception.NativeAudioException;
 import bo.htakey.rimic.model.User;
+import bo.htakey.rimic.net.PacketBuffer;
 import bo.htakey.rimic.net.RimicConnection;
 import bo.htakey.rimic.net.RimicUDPMessageType;
-import bo.htakey.rimic.net.PacketBuffer;
 import bo.htakey.rimic.protobuf.Mumble;
 import bo.htakey.rimic.util.RimicLogger;
 import bo.htakey.rimic.util.RimicNetworkListener;
@@ -96,8 +94,6 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
     private final Object mEncoderLock;
     private byte mTargetId;
 
-    private PresetReverb mAudioReverb;
-
     public AudioHandler(Context context, RimicLogger logger, int audioStream, int audioSource,
                         int sampleRate, int targetBitrate, int targetFramesPerPacket,
                         IInputMode inputMode, byte targetId, float amplitudeBoost,
@@ -141,11 +137,16 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         Log.v(Constants.TAG, "Handler: Initializing");
         setCodec(codec);
         Log.v(Constants.TAG, "Handler: Codec Initialized");
-        setServerMuted(self.isMuted() || self.isLocalMuted() || self.isSuppressed());
         startRecording();
+        setServerMuted(self.isMuted() || self.isLocalMuted() || self.isSuppressed());
         Log.v(Constants.TAG, "Handler: Recording Initialized");
 
-        mOutput.setmAudioTrackSessionID(mInput.getAudioSessionId());
+        int sessid = 0;
+        synchronized (mInput) {
+            sessid = mInput.getAudioSessionId();
+        }
+
+        mOutput.setmAudioTrackSessionID(sessid);
         int audiostream = mAudioStream;
         if (mAudioManager.isWiredHeadsetOn()) {
             audiostream = AudioManager.STREAM_VOICE_CALL;
@@ -153,8 +154,6 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
 
         mOutput.startPlaying(audiostream);
         Log.v(Constants.TAG, "Handler: Playing Initialized");
-
-        mAudioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
 
         if (audiostream == AudioManager.STREAM_MUSIC) {
             if (mAudioManager.isWiredHeadsetOn()) {
@@ -164,16 +163,6 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
             }
         } else {
             mAudioManager.setSpeakerphoneOn(false);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            mAudioReverb = new PresetReverb(0, mInput.getAudioSessionId());
-            mAudioReverb.setPreset(PresetReverb.PRESET_SMALLROOM);
-            if (audiostream == AudioManager.STREAM_MUSIC) {
-                mAudioReverb.setEnabled(true);
-            } else {
-                mAudioReverb.setEnabled(false);
-            }
         }
 
         mInitialized = true;
@@ -384,12 +373,6 @@ public class AudioHandler extends RimicNetworkListener implements AudioInput.Aud
         }
         mInitialized = false;
         mBluetoothOn = false;
-
-        if (mAudioReverb != null) {
-            mAudioReverb.setEnabled(false);
-            mAudioReverb.release();
-            mAudioReverb = null;
-        }
 
         mEncodeListener.onTalkingStateChanged(false);
         mAudioManager.setSpeakerphoneOn(false);
