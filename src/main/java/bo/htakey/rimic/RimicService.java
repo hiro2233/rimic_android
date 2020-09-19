@@ -182,7 +182,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     private boolean mReconnecting;
     private boolean inProcConnect;
     private static boolean inMistakeConnection;
-    private static int vMistakeCntConn;
+    private static volatile int vMistakeCntConn;
     //private static final ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
 
     private RimicWakeUpMon vRimicWakeUpMon = new RimicWakeUpMon();
