@@ -769,7 +769,8 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
             e.printStackTrace();
         }
 
-        setWakeLock(WAKE_TYPE.SET_TIME_ACQUIRE, 180000);
+        setWakeLock(WAKE_TYPE.SET_TIME_ACQUIRE, 300000);
+        setWiFiLock(WAKE_TYPE.ACQUIRE_PERMANENT);
 
         try {
             ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
@@ -814,6 +815,9 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
 
     @Override
     public void onConnectionDisconnected(RimicException e) {
+        setWakeLock(WAKE_TYPE.RELEASE);
+        setWiFiLock(WAKE_TYPE.RELEASE);
+
         if (e != null) {
             Log.e(Constants.TAG, "Service Error: " + e.getMessage() +
                     " (reason: " + e.getReason().name() + ")");
@@ -829,8 +833,6 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         if (mAudioHandler != null) {
             mAudioHandler.shutdown();
         }
-
-        setWakeLock(WAKE_TYPE.RELEASE);
 
         mModelHandler = null;
         mAudioHandler = null;
