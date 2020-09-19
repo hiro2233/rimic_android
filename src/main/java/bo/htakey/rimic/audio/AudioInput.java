@@ -151,10 +151,10 @@ public class AudioInput implements Runnable {
      */
     public void stopRecording() {
         if(!mRecording) return;
+        mRecording = false;
         synchronized (mInactiveLock) {
             mInactiveLock.notify();
         }
-        mRecording = false;
         try {
             mRecordThread.interrupt();
             mRecordThread.join();
