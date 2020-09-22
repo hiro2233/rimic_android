@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.security.Security;
@@ -216,6 +217,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
             if (type == 0) {
                 long now = System.currentTimeMillis();
                 while ((System.currentTimeMillis() - now) < millis) {
+                    SystemClock.sleep(1);
                 }
             } else if (type == 1) {
                 try {
@@ -756,9 +758,9 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         Log.v(Constants.TAG, "Connected");
 
         //tryUnregisterReceiver(mConnectivityReceiver);
-        tryUnregisterReceiver(vRimicWakeUpMon);
-        tryUnregisterReceiver(vTicksReceiverMin);
-
+        //tryUnregisterReceiver(vRimicWakeUpMon);
+        //tryUnregisterReceiver(vTicksReceiverMin);
+/*
         try {
             if (vAm != null && vPi != null) {
                 vAm.cancel(vPi);
@@ -768,28 +770,34 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+*/
         setWakeLock(WAKE_TYPE.SET_TIME_ACQUIRE, 300000);
         setWiFiLock(WAKE_TYPE.ACQUIRE_PERMANENT);
 
-        try {
-            ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
-            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            if (am != null && !am.isMusicActive()) {
+        Handler mainHandler = new Handler();
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
                 try {
-                    tn.startTone(ToneGenerator.TONE_DTMF_8, 300);
-                    delay(300, 0);
-                    tn.stopTone();
-                    tn.startTone(ToneGenerator.TONE_DTMF_9, 400);
-                    delay(400, 0);
-                    tn.stopTone();
-                } catch (Exception e) {
+                    ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
+                    AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    if (am != null && !am.isMusicActive()) {
+                        try {
+                            tn.startTone(ToneGenerator.TONE_DTMF_8, 300);
+                            delay(300, 0);
+                            tn.stopTone();
+                            tn.startTone(ToneGenerator.TONE_DTMF_9, 400);
+                            delay(400, 0);
+                            tn.stopTone();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (RuntimeException e) {
                     e.printStackTrace();
                 }
             }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
+        });
 
         try {
             mAudioHandler = mAudioBuilder.initialize(
@@ -826,7 +834,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
             setReconnecting(mAutoReconnect
                     && e.getReason() == RimicException.RimicDisconnectReason.CONNECTION_ERROR);
         } else {
-            Log.v(Constants.TAG, "Service Disconnected");
+            Log.i(Constants.TAG, "Service Disconnected");
             mConnectionState = ConnectionState.DISCONNECTED;
         }
 
