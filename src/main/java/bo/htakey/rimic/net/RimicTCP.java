@@ -143,20 +143,14 @@ public class RimicTCP extends RimicNetworkThread {
         } finally {
             mConnected = false;
             try {
-                if (mDataInput != null) mDataInput.close();
-                if (mDataOutput != null) mDataOutput.close();
-                if (mTCPSocket != null) mTCPSocket.close();
+                if (mDataInput != null) {
+                    mDataInput.close();
+                    mDataInput = null;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
             mRunning = false;
-
-            executeOnMainThread(new Runnable() {
-                @Override
-                public void run() {
-                    mListener.onTCPConnectionDisconnect();
-                }
-            });
             stopThreads();
         }
     }
@@ -178,6 +172,16 @@ public class RimicTCP extends RimicNetworkThread {
                     message.writeTo(mDataOutput);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    try {
+                        if (!mRunning) {
+                            mDataOutput.close();
+                            mDataOutput = null;
+                        } else {
+                            mDataOutput.flush();
+                        }
+                    } catch  (IOException err) {
+                        err.printStackTrace();
+                    }
                     // TODO handle
                 }
             }
@@ -201,6 +205,16 @@ public class RimicTCP extends RimicNetworkThread {
                     mDataOutput.write(message, 0, length);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    try {
+                        if (!mRunning) {
+                            mDataOutput.close();
+                            mDataOutput = null;
+                        } else {
+                            mDataOutput.flush();
+                        }
+                    } catch  (IOException err) {
+                        err.printStackTrace();
+                    }
                 }
             }
         });
@@ -221,8 +235,10 @@ public class RimicTCP extends RimicNetworkThread {
             @Override
             public void run() {
                 try {
-                    if (mTCPSocket != null)
+                    if (mTCPSocket != null) {
                         mTCPSocket.close();
+                        mTCPSocket = null;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
