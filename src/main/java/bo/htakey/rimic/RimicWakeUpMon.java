@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.ConnectivityManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -31,6 +32,7 @@ public class RimicWakeUpMon extends BroadcastReceiver {
             if (type == 0) {
                 long now = System.currentTimeMillis();
                 while ((System.currentTimeMillis() - now) < millis) {
+                    SystemClock.sleep(1);
                 }
             } else if (type == 1) {
                 try {
