@@ -92,7 +92,7 @@ int main_test(int argc, char *argv[])
     pthread_attr_setdetachstate(&thread_attr_timer, PTHREAD_CREATE_DETACHED);
     pthread_attr_setstacksize(&thread_attr_timer, 2048);
 
-    pthread_attr_setschedpolicy(&thread_attr_timer, SCHED_FIFO);
+    pthread_attr_setschedpolicy(&thread_attr_timer, SCHED_OTHER);
     pthread_create(&isr_timer_thread, &thread_attr_timer, &_fire_isr_timer, NULL);
     pthread_attr_destroy(&thread_attr_timer);
 
