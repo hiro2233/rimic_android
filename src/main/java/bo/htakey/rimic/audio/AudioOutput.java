@@ -196,7 +196,9 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
                         e.printStackTrace();
                     }
                 }
-                RimicService.setWakeLock(RimicService.WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+                if (mRunning) {
+                    RimicService.setWakeLock(RimicService.WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+                }
                 vActivityLastDetected = System.currentTimeMillis();
                 mAudioTrack.play();
                 Log.v(Constants.TAG, "Output Playing");
