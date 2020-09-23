@@ -123,6 +123,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     public static final String EXTRAS_ENABLE_PREPROCESSOR = "enable_preprocessor";
     public static final String WAKE_UP_ACTION = "bo.htakey.rimic.RimicService.WAKE_UP_ACTION";
     public static final String WAKE_UP_CONNECT = "bo.htakey.rimic.RimicService.WAKE_UP_CONNECT";
+    public static final String EXTRAS_FIRST_CONFIG = "first_config";
 
     public enum WAKE_TYPE {
         ACQUIRE_PERMANENT,
@@ -408,6 +409,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
+            Log.i(Constants.TAG, "Start command intent started - " + intent.getAction());
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 try {
@@ -508,21 +510,25 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
                         unregisterReceiver(mBluetoothReceiver);
                         registered_br[0] = false;
                     }
+                    break;
                 case BR_WAKEUP_MON:
                     if (registered_br[1]) {
                         unregisterReceiver(vRimicWakeUpMon);
                         registered_br[1] = false;
                     }
+                    break;
                 case BR_TICKS:
                     if (registered_br[2]) {
                         unregisterReceiver(vTicksReceiverMin);
                         registered_br[2] = false;
                     }
+                    break;
                 case BR_CONNECTIVITY:
                     if (registered_br[3]) {
                         unregisterReceiver(mConnectivityReceiver);
                         registered_br[3] = false;
                     }
+                    break;
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -537,16 +543,19 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
                     registerReceiver(mBluetoothReceiver, ifilter);
                     registered_br[0] = true;
                 }
+                break;
             case BR_WAKEUP_MON:
                 if (!registered_br[1] && vRimicWakeUpMon != null) {
                     registerReceiver(vRimicWakeUpMon, ifilter);
                     registered_br[1] = true;
                 }
+                break;
             case BR_TICKS:
                 if (!registered_br[2] && vTicksReceiverMin != null) {
                     registerReceiver(vTicksReceiverMin, ifilter);
                     registered_br[2] = true;
                 }
+                break;
             case BR_CONNECTIVITY:
                 if (registered_br[3] && mConnectivityReceiver != null) {
                     registerReceiver(mConnectivityReceiver, ifilter);
@@ -1115,7 +1124,13 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
 
         // Reload audio subsystem if initialized
         if (mAudioHandler != null && mAudioHandler.isInitialized()) {
-            createAudioHandler();
+            boolean first_config = extras.getBoolean(EXTRAS_FIRST_CONFIG);
+            if (!first_config) {
+                createAudioHandler();
+                Log.i(Constants.TAG, "Created audio handler.");
+            } else {
+                reconnectNeeded = true;
+            }
             Log.i(Constants.TAG, "Audio subsystem reloaded after settings change.");
         }
         return reconnectNeeded;
