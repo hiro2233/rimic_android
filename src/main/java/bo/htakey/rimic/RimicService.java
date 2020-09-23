@@ -131,6 +131,15 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         TRY_ACQUIRE_TIME
     }
 
+    private enum RECEIVERS_CLASS {
+        BR_BLUETOOTH,
+        BR_WAKEUP_MON,
+        BR_TICKS,
+        BR_CONNECTIVITY
+    }
+
+    private boolean[] registered_br = new boolean[4];
+
     // Service settings
     private Server mServer;
     private boolean mAutoReconnect;
@@ -269,7 +278,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
                 Log.i(Constants.TAG, "vTicksReceiverMin Before: " + mReconnecting + " Fire connect: " + fireConnect + " Intent action: " + iAction + " - " + calendar.getTime().toGMTString());
 
                 if (!mReconnecting) {
-                    tryUnregisterReceiver(this);
+                    tryUnregisterReceiver(RECEIVERS_CLASS.BR_TICKS);
 
                     if (!inMistakeConnection) {
                     /*
@@ -315,7 +324,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
                 final String iAction = intent.getAction();
 
                 if (!mReconnecting) {
-                    tryUnregisterReceiver(this);
+                    tryUnregisterReceiver(RECEIVERS_CLASS.BR_CONNECTIVITY);
 
                     if (!inMistakeConnection) {
                     /*
@@ -433,7 +442,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
             //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 //intentWakeUpFilterMon.addAction(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
             //}
-            registerReceiver(vRimicWakeUpMon, intentWakeUpFilterMon);
+            register_receiver(RECEIVERS_CLASS.BR_WAKEUP_MON, intentWakeUpFilterMon);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -460,7 +469,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
             //intentWakeUpFilter.addAction(Intent.ACTION_SCREEN_ON);
             //intentWakeUpFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
             //intentWakeUpFilter.setPriority(90000);
-            registerReceiver(vTicksReceiverMin, intentWakeUpFilter);
+            register_receiver(RECEIVERS_CLASS.BR_TICKS, intentWakeUpFilter);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -489,11 +498,58 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
      * @param br:
      * Broadcaste to try unregister.
      */
-    private void tryUnregisterReceiver(BroadcastReceiver br) {
+    private void tryUnregisterReceiver(RECEIVERS_CLASS br) {
         try {
-            unregisterReceiver(br);
+            switch (br) {
+                case BR_BLUETOOTH:
+                    if (registered_br[0]) {
+                        unregisterReceiver(mBluetoothReceiver);
+                        registered_br[0] = false;
+                    }
+                case BR_WAKEUP_MON:
+                    if (registered_br[1]) {
+                        unregisterReceiver(vRimicWakeUpMon);
+                        registered_br[1] = false;
+                    }
+                case BR_TICKS:
+                    if (registered_br[2]) {
+                        unregisterReceiver(vTicksReceiverMin);
+                        registered_br[2] = false;
+                    }
+                case BR_CONNECTIVITY:
+                    if (registered_br[3]) {
+                        unregisterReceiver(mConnectivityReceiver);
+                        registered_br[3] = false;
+                    }
+            }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void register_receiver(RECEIVERS_CLASS br, IntentFilter ifilter)
+    {
+        switch (br) {
+            case BR_BLUETOOTH:
+                if (!registered_br[0] && mBluetoothReceiver != null) {
+                    registerReceiver(mBluetoothReceiver, ifilter);
+                    registered_br[0] = true;
+                }
+            case BR_WAKEUP_MON:
+                if (!registered_br[1] && vRimicWakeUpMon != null) {
+                    registerReceiver(vRimicWakeUpMon, ifilter);
+                    registered_br[1] = true;
+                }
+            case BR_TICKS:
+                if (!registered_br[2] && vTicksReceiverMin != null) {
+                    registerReceiver(vTicksReceiverMin, ifilter);
+                    registered_br[2] = true;
+                }
+            case BR_CONNECTIVITY:
+                if (registered_br[3] && mConnectivityReceiver != null) {
+                    registerReceiver(mConnectivityReceiver, ifilter);
+                    registered_br[3] = true;
+                }
         }
     }
 
@@ -608,7 +664,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
                 .setTalkingListener(mAudioOutputListener);
         mConnectionState = ConnectionState.DISCONNECTED;
         mBluetoothReceiver = new BluetoothScoReceiver(this, this);
-        registerReceiver(mBluetoothReceiver, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED));
+        register_receiver(RECEIVERS_CLASS.BR_BLUETOOTH, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED));
         mToggleInputMode = new ToggleInputMode();
         mActivityInputMode = new ActivityInputMode(0); // FIXME: reasonable default
         mContinuousInputMode = new ContinuousInputMode();
@@ -617,10 +673,10 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
 
     @Override
     public void onDestroy() {
-        tryUnregisterReceiver(mBluetoothReceiver);
-        //tryUnregisterReceiver(mConnectivityReceiver);
-        tryUnregisterReceiver(vRimicWakeUpMon);
-        tryUnregisterReceiver(vTicksReceiverMin);
+        tryUnregisterReceiver(RECEIVERS_CLASS.BR_BLUETOOTH);
+        //tryUnregisterReceiver(RECEIVERS_CLASS.BR_CONNECTIVITY);
+        tryUnregisterReceiver(RECEIVERS_CLASS.BR_WAKEUP_MON);
+        tryUnregisterReceiver(RECEIVERS_CLASS.BR_TICKS);
         try {
             if (vAm != null && vPi != null) {
                 vAm.cancel(vPi);
@@ -679,10 +735,10 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
                 mConnection.disconnect();
 
                 if (!inMistakeConnection) {
-                    tryUnregisterReceiver(mBluetoothReceiver);
-                    //tryUnregisterReceiver(mConnectivityReceiver);
-                    tryUnregisterReceiver(vRimicWakeUpMon);
-                    tryUnregisterReceiver(vTicksReceiverMin);
+                    tryUnregisterReceiver(RECEIVERS_CLASS.BR_BLUETOOTH);
+                    //tryUnregisterReceiver(RECEIVERS_CLASS.BR_CONNECTIVITY);
+                    tryUnregisterReceiver(RECEIVERS_CLASS.BR_WAKEUP_MON);
+                    tryUnregisterReceiver(RECEIVERS_CLASS.BR_TICKS);
                     try {
                         if (vAm != null && vPi != null) {
                             vAm.cancel(vPi);
@@ -757,10 +813,10 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
 
         Log.v(Constants.TAG, "Connected");
 
-        //tryUnregisterReceiver(mConnectivityReceiver);
-        //tryUnregisterReceiver(vRimicWakeUpMon);
-        //tryUnregisterReceiver(vTicksReceiverMin);
-/*
+        tryUnregisterReceiver(RECEIVERS_CLASS.BR_CONNECTIVITY);
+        tryUnregisterReceiver(RECEIVERS_CLASS.BR_WAKEUP_MON);
+        tryUnregisterReceiver(RECEIVERS_CLASS.BR_TICKS);
+
         try {
             if (vAm != null && vPi != null) {
                 vAm.cancel(vPi);
@@ -770,7 +826,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         } catch (Exception e) {
             e.printStackTrace();
         }
-*/
+
         setWakeLock(WAKE_TYPE.SET_TIME_ACQUIRE, 300000);
         setWiFiLock(WAKE_TYPE.ACQUIRE_PERMANENT);
 
@@ -1154,9 +1210,9 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     @Override
     public void cancelReconnect() {
         setReconnecting(false);
-        //tryUnregisterReceiver(mConnectivityReceiver);
-        tryUnregisterReceiver(vRimicWakeUpMon);
-        tryUnregisterReceiver(vTicksReceiverMin);
+        //tryUnregisterReceiver(RECEIVERS_CLASS.BR_CONNECTIVITY);
+        tryUnregisterReceiver(RECEIVERS_CLASS.BR_WAKEUP_MON);
+        tryUnregisterReceiver(RECEIVERS_CLASS.BR_TICKS);
         try {
             if (vAm != null && vPi != null) {
                 vAm.cancel(vPi);
