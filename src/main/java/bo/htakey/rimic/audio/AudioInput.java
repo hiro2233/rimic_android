@@ -156,12 +156,11 @@ public class AudioInput implements Runnable {
             mInactiveLock.notify();
         }
         try {
-            mRecordThread.interrupt();
             mRecordThread.join();
-            mRecordThread = null;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        mRecordThread = null;
     }
 
     /**
@@ -245,7 +244,9 @@ public class AudioInput implements Runnable {
                         e.printStackTrace();
                     }
                 }
-                RimicService.setWakeLock(RimicService.WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+                if (mRecording) {
+                    RimicService.setWakeLock(RimicService.WAKE_TYPE.TRY_ACQUIRE_TIME, 180000);
+                }
                 Log.v(Constants.TAG, "Record recovered");
             }
         }
