@@ -435,7 +435,9 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
             intentWakeUpFilterMon.addAction(RimicWakeUpMon.WAKE_UP_ACTION_MON);
             intentWakeUpFilterMon.addAction(RimicService.WAKE_UP_ACTION);
             intentWakeUpFilterMon.addAction(Intent.ACTION_SCREEN_ON);
-            intentWakeUpFilterMon.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            if (vMistakeCntConn > 1) {
+                intentWakeUpFilterMon.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            }
             //intentWakeUpFilterMon.addAction(WifiManager.RSSI_CHANGED_ACTION);
             //intentWakeUpFilterMon.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
             //intentWakeUpFilterMon.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
@@ -490,7 +492,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        Log.v(Constants.TAG, "Alarm is set");
+        Log.v(Constants.TAG, "Alarm is set vMistakeCnt: " + vMistakeCntConn);
     }
 
     /**
