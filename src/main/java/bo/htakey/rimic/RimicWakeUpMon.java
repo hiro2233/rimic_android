@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.ConnectivityManager;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -45,9 +46,33 @@ public class RimicWakeUpMon extends BroadcastReceiver {
         }
     }
 
+    private void run_tones(final String action) {
+        Handler mainHandler = new Handler();
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
+                if (RimicService.WAKE_UP_ACTION.equals(action)) {
+                    tn.startTone(ToneGenerator.TONE_CDMA_INTERCEPT, 550);
+                } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+                    tn.startTone(ToneGenerator.TONE_CDMA_PRESSHOLDKEY_LITE, 550);
+                } else if (WAKE_UP_ACTION_MON.equals(action)) {
+                    if (BuildConfig.DEBUG) {
+                        tn.startTone(ToneGenerator.TONE_PROP_BEEP2, 300);
+                    }
+                } else {
+                    tn.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 550);
+                }
+                delay(600, 0);
+                tn.stopTone();
+                delay(250, 0);
+            }
+        });
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
+        final String action = intent.getAction();
         fireBroadcast(context);
         int mistake_cnt = RimicService.getMistakeCntConn();
         if (RimicService.isInMistakeConnection() && mistake_cnt > 1) {
@@ -57,26 +82,11 @@ public class RimicWakeUpMon extends BroadcastReceiver {
         Log.v(Constants.TAG, "Intent: " + action);
         try {
             vObjectLockTone.lock();
-            //synchronized (vObjectLockTone) {
             try {
                 AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-                ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
                 if (am != null && !am.isMusicActive()) {
                     try {
-                        if (RimicService.WAKE_UP_ACTION.equals(intent.getAction())) {
-                            tn.startTone(ToneGenerator.TONE_CDMA_INTERCEPT, 550);
-                        } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
-                            tn.startTone(ToneGenerator.TONE_CDMA_PRESSHOLDKEY_LITE, 550);
-                        } else if (WAKE_UP_ACTION_MON.equals(intent.getAction())) {
-                            if (BuildConfig.DEBUG) {
-                                tn.startTone(ToneGenerator.TONE_PROP_BEEP2, 300);
-                            }
-                        } else {
-                            tn.startTone(ToneGenerator.TONE_CDMA_ONE_MIN_BEEP, 550);
-                        }
-                        delay(600, 0);
-                        tn.stopTone();
-                        delay(250, 0);
+                        run_tones(action);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -84,7 +94,6 @@ public class RimicWakeUpMon extends BroadcastReceiver {
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
-            //}
         } finally {
             vObjectLockTone.unlock();
         }
