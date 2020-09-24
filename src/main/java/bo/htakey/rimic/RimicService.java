@@ -432,6 +432,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
     }
 
     private void setAlarm(long time) {
+        logMon.startTicks(1,1);
         try {
             IntentFilter intentWakeUpFilterMon = new IntentFilter();
             intentWakeUpFilterMon.addAction(RimicWakeUpMon.WAKE_UP_ACTION_MON);
@@ -786,7 +787,6 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
         synchronized (vObjectLockinMistake) {
             vMistakeCntConn = 0;
         }
-        logMon.startTicks(1,1);
         // Send version information and authenticate.
         final Mumble.Version.Builder version = Mumble.Version.newBuilder();
         version.setRelease(mClientName);
