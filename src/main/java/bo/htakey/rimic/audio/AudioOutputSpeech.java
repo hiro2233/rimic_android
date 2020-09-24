@@ -79,7 +79,7 @@ public class AudioOutputSpeech implements Callable<AudioOutputSpeech.Result> {
         mTalkStateListener = listener;
         switch (codec) {
             case UDPVoiceOpus:
-                mAudioBufferSize = AudioHandler.FRAME_SIZE * 8;
+                mAudioBufferSize = AudioHandler.FRAME_SIZE * 12;
                 mDecoder = new Opus.OpusDecoder(AudioHandler.SAMPLE_RATE, 1);
                 break;
             case UDPVoiceCELTBeta:
@@ -276,7 +276,7 @@ public class AudioOutputSpeech implements Callable<AudioOutputSpeech.Result> {
                         if(mFrames.isEmpty() && mHasTerminator)
                             nextAlive = false;
                     } else {
-                        decodedSamples = mDecoder.decodeFloat(null, 0, mOut, AudioHandler.FRAME_SIZE);
+                        decodedSamples = mDecoder.decodeFloat(null, 0, mOut, mAudioBufferSize);
                     }
                 } catch (NativeAudioException e) {
                     e.printStackTrace();
