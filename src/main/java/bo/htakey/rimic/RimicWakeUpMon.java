@@ -51,7 +51,7 @@ public class RimicWakeUpMon extends BroadcastReceiver {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
+                ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, ToneGenerator.MAX_VOLUME / 2);
                 if (RimicService.WAKE_UP_ACTION.equals(action)) {
                     tn.startTone(ToneGenerator.TONE_CDMA_INTERCEPT, 550);
                 } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
