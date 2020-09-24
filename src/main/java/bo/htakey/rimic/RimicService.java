@@ -255,7 +255,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
                 final boolean fireConnect = intent.getBooleanExtra(RimicService.WAKE_UP_ACTION, false);
 
                 try {
-                    ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
+                    ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, ToneGenerator.MAX_VOLUME / 2);
                     AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
                     if (am != null && !am.isMusicActive()) {
                         try {
@@ -846,7 +846,7 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
             @Override
             public void run() {
                 try {
-                    ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME / 2);
+                    ToneGenerator tn = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, ToneGenerator.MAX_VOLUME / 2);
                     AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                     if (am != null && !am.isMusicActive()) {
                         try {
