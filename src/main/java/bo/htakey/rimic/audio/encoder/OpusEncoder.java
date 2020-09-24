@@ -60,6 +60,10 @@ public class OpusEncoder implements IEncoder {
         if(error.get() < 0) throw new NativeAudioException("Opus encoder initialization failed with error: "+error.get());
         Opus.opus_encoder_ctl(mState, Opus.OPUS_SET_VBR_REQUEST, 0);
         Opus.opus_encoder_ctl(mState, Opus.OPUS_SET_BITRATE_REQUEST, bitrate);
+        Opus.opus_encoder_ctl(mState, Opus.OPUS_SET_VBR_CONSTRAINT_REQUEST, 0);
+        Opus.opus_encoder_ctl(mState, Opus.OPUS_SET_BANDWIDTH_REQUEST, Opus.OPUS_BANDWIDTH_NARROWBAND);
+        Opus.opus_encoder_ctl(mState, Opus.OPUS_SET_MAX_BANDWIDTH_REQUEST, Opus.OPUS_BANDWIDTH_NARROWBAND);
+        Opus.opus_encoder_ctl(mState, Opus.OPUS_SET_SIGNAL_REQUEST, Opus.OPUS_SIGNAL_VOICE);
     }
 
     @Override
