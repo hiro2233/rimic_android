@@ -38,7 +38,16 @@ public class Opus {
 
     public static final int OPUS_SET_BITRATE_REQUEST = 4002;
     public static final int OPUS_GET_BITRATE_REQUEST = 4003;
+    public static final int OPUS_SET_MAX_BANDWIDTH_REQUEST = 4004;
     public static final int OPUS_SET_VBR_REQUEST = 4006;
+    public static final int OPUS_SET_BANDWIDTH_REQUEST = 4008;
+    public static final int OPUS_SET_VBR_CONSTRAINT_REQUEST = 4020;
+    public static final int OPUS_SET_SIGNAL_REQUEST = 4024;
+
+    public static final int OPUS_SIGNAL_VOICE = 3001;
+    public static final int OPUS_BANDWIDTH_NARROWBAND = 1101;
+    public static final int OPUS_BANDWIDTH_MEDIUMBAND = 1102;
+    public static final int OPUS_BANDWIDTH_WIDEBAND = 1103;
 
     public static native int opus_decoder_get_size(int channels);
     public static native Pointer opus_decoder_create(int fs, int channels, IntPointer error);
