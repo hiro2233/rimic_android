@@ -83,7 +83,7 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
         int minBufferSize = AudioTrack.getMinBufferSize(AudioHandler.SAMPLE_RATE,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
         mBufferSize = Math.min(minBufferSize, AudioHandler.FRAME_SIZE * 8);
-        Log.v(Constants.TAG, "Using buffer size " + mBufferSize + ", system's min buffer size: " + minBufferSize);
+        Log.v(Constants.TAG, "#1 OUTPUT using buffer size " + mBufferSize + ", system's min buffer size: " + minBufferSize);
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -208,6 +208,7 @@ public class AudioOutput implements Runnable, AudioOutputSpeech.TalkStateListene
         mAudioTrack.pause();
         mAudioTrack.flush();
         mAudioTrack.stop();
+        RimicService.setWakeLock(RimicService.WAKE_TYPE.RELEASE);
         Log.v(Constants.TAG, "Main Output Stopped");
     }
 
