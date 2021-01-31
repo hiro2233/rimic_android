@@ -824,6 +824,8 @@ public class RimicService extends Service implements IRimicService, IRimicSessio
 
         Log.v(Constants.TAG, "Connected");
 
+        logMon.stopTicks();
+
         tryUnregisterReceiver(RECEIVERS_CLASS.BR_CONNECTIVITY);
         tryUnregisterReceiver(RECEIVERS_CLASS.BR_WAKEUP_MON);
         tryUnregisterReceiver(RECEIVERS_CLASS.BR_TICKS);
