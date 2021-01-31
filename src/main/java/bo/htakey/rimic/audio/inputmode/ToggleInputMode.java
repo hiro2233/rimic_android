@@ -17,13 +17,8 @@
 
 package bo.htakey.rimic.audio.inputmode;
 
-import android.util.Log;
-
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import bo.htakey.rimic.Constants;
 
 /**
  * An input mode that depends on a toggle, such as push to talk.
@@ -32,12 +27,10 @@ import bo.htakey.rimic.Constants;
 public class ToggleInputMode implements IInputMode {
     private boolean mInputOn;
     private final Lock mToggleLock;
-    private final Condition mToggleCondition;
 
     public ToggleInputMode() {
         mInputOn = false;
         mToggleLock = new ReentrantLock();
-        mToggleCondition = mToggleLock.newCondition();
     }
 
     public void toggleTalkingOn() {
@@ -51,7 +44,6 @@ public class ToggleInputMode implements IInputMode {
     public void setTalkingOn(boolean talking) {
         mToggleLock.lock();
         mInputOn = talking;
-        mToggleCondition.signalAll();
         mToggleLock.unlock();
     }
 
@@ -62,17 +54,12 @@ public class ToggleInputMode implements IInputMode {
 
     @Override
     public void waitForInput() {
-        mToggleLock.lock();
         if (!mInputOn) {
-            Log.v(Constants.TAG, "PTT: Suspending audio input.");
-            long startTime = System.currentTimeMillis();
             try {
-                mToggleCondition.await();
+                Thread.sleep(1);
             } catch (InterruptedException e) {
-                Log.w(Constants.TAG, "Blocking for PTT interrupted, likely due to input thread shutdown.");
+                //e.printStackTrace();
             }
-            Log.v(Constants.TAG, "PTT: Suspended audio input for " + (System.currentTimeMillis() - startTime) + "ms.");
         }
-        mToggleLock.unlock();
     }
 }
