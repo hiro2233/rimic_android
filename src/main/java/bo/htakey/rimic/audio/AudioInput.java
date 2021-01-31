@@ -252,6 +252,7 @@ public class AudioInput implements Runnable {
         }
 
         mAudioRecord.stop();
+        RimicService.setWiFiLock(RimicService.WAKE_TYPE.RELEASE);
         Log.i(Constants.TAG, "AudioInput: stopped");
     }
 
